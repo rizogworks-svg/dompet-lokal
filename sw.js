@@ -1,4 +1,4 @@
-const CACHE_NAME="dompet-lokal-v11-3-1";
+const CACHE_NAME="dompet-lokal-v11-4";
 const ASSETS=[
   "./",
   "./index.html",

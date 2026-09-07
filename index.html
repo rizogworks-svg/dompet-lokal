@@ -271,6 +271,72 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
   .sidebar{width:54px}
   .hero-balance{font-size:30px}
 }
+
+/* ===== Tagihan Dashboard ===== */
+.bill-dashboard{display:flex;flex-direction:column;gap:10px}
+.bill-summary{
+  padding:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.bill-summary-copy{min-width:0}
+.bill-summary-label{font-size:9px;color:var(--muted);font-weight:600}
+.bill-summary-total{font-size:25px;line-height:1.05;font-weight:800;margin-top:5px}
+.bill-summary-sub{font-size:8.7px;color:var(--muted);margin-top:5px}
+.bill-add-btn{
+  width:40px;height:40px;min-width:40px;border-radius:50%;
+  border:1.2px solid var(--line);background:var(--green-soft);
+  display:grid;place-items:center;padding:0;position:relative;
+}
+.bill-add-btn::before,.bill-add-btn::after{
+  content:"";position:absolute;background:var(--ink);border-radius:2px
+}
+.bill-add-btn::before{width:16px;height:1.8px}
+.bill-add-btn::after{width:1.8px;height:16px}
+.bill-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bill-stat{padding:10px}
+.bill-stat small{display:block;font-size:8.5px;color:var(--muted)}
+.bill-stat b{display:block;font-size:13px;margin-top:3px}
+.bill-item{padding:12px;margin-bottom:8px}
+.bill-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.bill-item-name{font-size:11px;font-weight:800}
+.bill-item-meta{font-size:8.8px;color:var(--muted);margin-top:3px}
+.bill-badge{
+  white-space:nowrap;font-size:8px;font-weight:800;
+  padding:4px 7px;border-radius:999px;background:#f2f2f2
+}
+.bill-badge.paid{background:var(--green-soft)}
+.bill-amount{font-size:18px;font-weight:800;margin-top:10px}
+.bill-actions{display:flex;gap:7px;margin-top:10px}
+.bill-paid-btn{background:var(--green-soft)!important;border-color:#cdd8ca!important}
+.bill-waiting{
+  width:100%;padding:8px 10px;border-radius:10px;
+  background:#f5f5f5;font-size:8.8px;color:var(--muted);text-align:center
+}
+.bill-modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.28);
+  display:none;align-items:flex-end;justify-content:center;
+  z-index:999;padding:12px
+}
+.bill-modal-backdrop.show{display:flex}
+.bill-modal{
+  width:min(100%,430px);max-height:88vh;overflow:auto;
+  background:var(--surface-2);border:1.2px solid var(--line);
+  border-radius:20px 20px 14px 14px;padding:14px;
+  box-shadow:0 20px 50px rgba(0,0,0,.16)
+}
+.bill-modal-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:12px
+}
+.bill-modal-head h3{margin:0;font-size:13px}
+.bill-close{
+  width:32px;height:32px;border-radius:50%;border:1.1px solid var(--line);
+  background:#fff;font-size:18px;line-height:1;padding:0
+}
+
 </style>
 </head>
 <body>
@@ -492,8 +558,42 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
           <div class="head-spacer" aria-hidden="true"></div>
         </div>
 
-        <div class="card form-card">
-          <div class="section-head" style="margin-top:0"><h3 id="billFormTitle">Tambah Tagihan</h3></div>
+        <div class="bill-dashboard">
+          <div class="card bill-summary">
+            <div class="bill-summary-copy">
+              <div class="bill-summary-label">Total Tagihan Bulan Ini</div>
+              <div class="bill-summary-total" id="billMonthTotal">Rp0</div>
+              <div class="bill-summary-sub" id="billMonthCaption">0 tagihan</div>
+            </div>
+            <button class="bill-add-btn" type="button" onclick="openBillModal()" aria-label="Tambah Tagihan"></button>
+          </div>
+
+          <div class="bill-stats">
+            <div class="card bill-stat">
+              <small>Sudah Dibayar</small>
+              <b id="billPaidTotal">Rp0</b>
+            </div>
+            <div class="card bill-stat">
+              <small>Belum Dibayar</small>
+              <b id="billUnpaidTotal">Rp0</b>
+            </div>
+          </div>
+
+          <div class="section-head"><h3>Daftar Tagihan</h3></div>
+          <div id="billList"></div>
+
+          <button class="btn secondary" type="button" onclick="enableBillNotifications()" style="width:100%">
+            Aktifkan Pengingat H-1
+          </button>
+        </div>
+      </section>
+
+      <div id="billModal" class="bill-modal-backdrop" onclick="billBackdropClose(event)">
+        <div class="bill-modal" role="dialog" aria-modal="true" aria-labelledby="billModalTitle">
+          <div class="bill-modal-head">
+            <h3 id="billModalTitle">Tambah Tagihan</h3>
+            <button class="bill-close" type="button" onclick="closeBillModal()" aria-label="Tutup">×</button>
+          </div>
 
           <input id="billId" type="hidden">
 
@@ -508,7 +608,7 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
           </label>
 
           <label class="field">
-            <span>Tanggal Bayar Tiap Bulan</span>
+            <span>Tanggal Bayar</span>
             <input id="billDay" type="number" min="1" max="31" value="1">
           </label>
 
@@ -528,20 +628,14 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
           </label>
 
           <div class="form-actions">
-            <button id="cancelBillBtn" class="btn secondary hidden" type="button" onclick="resetBillForm()">Batal</button>
+            <button id="deleteBillModalBtn" class="btn secondary hidden" type="button" onclick="deleteBillFromModal()">Hapus</button>
             <button class="btn primary grow" type="button" onclick="saveBill()">Simpan</button>
           </div>
         </div>
+      </div>
 
-        <button class="btn secondary" type="button" onclick="enableBillNotifications()" style="width:100%;margin-top:10px">
-          Aktifkan Pengingat H-1
-        </button>
 
-        <div class="section-head"><h3>Pengeluaran Tetap</h3></div>
-        <div id="billList"></div>
-      </section>
-
-      <section id="report" class="page">
+<section id="report" class="page">
         <div class="page-head">
           <button class="circle-btn green" onclick="go('home')" aria-label="Kembali"><span class="icon back"></span></button>
           <h1>Laporan Bulanan</h1>
@@ -650,6 +744,7 @@ function normalizeData(){
   if(!Array.isArray(data.wallets))data.wallets=[];
   if(!Array.isArray(data.tx))data.tx=[];
   if(!Array.isArray(data.bills))data.bills=[];
+  data.bills.forEach(b=>{if(!b.payments||typeof b.payments!=="object")b.payments={};});
   if(!data.categories)data.categories=defaultData().categories;
   if(!Array.isArray(data.categories.EXPENSE))data.categories.EXPENSE=defaultData().categories.EXPENSE;
   if(!Array.isArray(data.categories.INCOME))data.categories.INCOME=defaultData().categories.INCOME;
@@ -815,6 +910,10 @@ function renderReport(){
 
 }
 
+
+function monthKey(date=new Date()){
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`;
+}
 function fillBillSelects(){
   const wallet=$("billWallet"),cat=$("billCategory");
   if(!wallet||!cat)return;
@@ -826,13 +925,39 @@ function fillBillSelects(){
 }
 function resetBillForm(){
   $("billId").value="";
-  $("billFormTitle").textContent="Tambah Tagihan";
+  $("billModalTitle").textContent="Tambah Tagihan";
   $("billName").value="";
   setMoneyInput($("billAmount"),0);
   $("billDay").value="1";
   $("billNote").value="";
-  $("cancelBillBtn").classList.add("hidden");
+  $("deleteBillModalBtn").classList.add("hidden");
   fillBillSelects();
+}
+function openBillModal(id=null){
+  resetBillForm();
+  if(id){
+    const b=data.bills.find(x=>String(x.id)===String(id));
+    if(!b)return;
+    $("billId").value=b.id;
+    $("billModalTitle").textContent="Edit Tagihan";
+    $("billName").value=b.name||"";
+    setMoneyInput($("billAmount"),b.amount||0);
+    $("billDay").value=b.day||1;
+    $("billWallet").value=String(b.walletId||"");
+    $("billCategory").value=b.category||"Tagihan";
+    $("billNote").value=b.note||"";
+    $("deleteBillModalBtn").classList.remove("hidden");
+  }
+  $("billModal").classList.add("show");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>$("billName")?.focus(),120);
+}
+function closeBillModal(){
+  $("billModal").classList.remove("show");
+  document.body.style.overflow="";
+}
+function billBackdropClose(e){
+  if(e.target===$("billModal"))closeBillModal();
 }
 function saveBill(){
   const id=$("billId").value;
@@ -844,6 +969,7 @@ function saveBill(){
   const note=$("billNote").value.trim();
 
   if(!name){alert("Nama tagihan belum diisi.");return}
+  if(amount<=0){alert("Nominal harus lebih dari 0.");return}
   if(!walletId){alert("Pilih dompet untuk tagihan.");return}
 
   if(id){
@@ -853,91 +979,112 @@ function saveBill(){
     data.bills.push({
       id:`bill-${Date.now()}`,
       name,amount,day,walletId,category,note,
-      createdAt:new Date().toISOString()
+      createdAt:new Date().toISOString(),
+      payments:{}
     });
   }
+  closeBillModal();
   resetBillForm();
   save();
   refresh();
 }
-function editBill(id){
-  const b=data.bills.find(x=>String(x.id)===String(id));
-  if(!b)return;
-  go("bills");
-  fillBillSelects();
-  $("billId").value=b.id;
-  $("billFormTitle").textContent="Edit Tagihan";
-  $("billName").value=b.name||"";
-  setMoneyInput($("billAmount"),b.amount||0);
-  $("billDay").value=b.day||1;
-  $("billWallet").value=String(b.walletId||"");
-  $("billCategory").value=b.category||"Tagihan";
-  $("billNote").value=b.note||"";
-  $("cancelBillBtn").classList.remove("hidden");
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-function deleteBill(id){
+function deleteBillFromModal(){
+  const id=$("billId").value;
+  if(!id)return;
   const b=data.bills.find(x=>String(x.id)===String(id));
   if(!b)return;
   if(confirm(`Hapus tagihan "${b.name}"?`)){
     data.bills=data.bills.filter(x=>String(x.id)!==String(id));
+    closeBillModal();
     save();
     refresh();
   }
 }
-function dueForBill(b){
+function isBillPaidThisMonth(b){
+  if(!b.payments||typeof b.payments!=="object")b.payments={};
+  return !!b.payments[monthKey()];
+}
+function billPaymentThisMonth(b){
+  if(!b.payments||typeof b.payments!=="object")b.payments={};
+  return b.payments[monthKey()]||null;
+}
+function effectiveBillDay(b,date=new Date()){
+  const y=date.getFullYear(),m=date.getMonth();
+  const max=new Date(y,m+1,0).getDate();
+  return Math.min(Math.max(1,Number(b.day)||1),max);
+}
+function billDueDateThisMonth(b){
   const now=new Date();
-  const y=now.getFullYear(),m=now.getMonth();
-  const maxThis=new Date(y,m+1,0).getDate();
-  const day=Math.min(Math.max(1,Number(b.day)||1),maxThis);
-  let due=new Date(y,m,day);
-  due.setHours(0,0,0,0);
-  const today0=new Date(y,m,now.getDate());
-  today0.setHours(0,0,0,0);
-  if(due<today0){
-    const ny=m===11?y+1:y, nm=m===11?0:m+1;
-    const maxNext=new Date(ny,nm+1,0).getDate();
-    due=new Date(ny,nm,Math.min(Math.max(1,Number(b.day)||1),maxNext));
-    due.setHours(0,0,0,0);
-  }
-  return due;
+  const d=new Date(now.getFullYear(),now.getMonth(),effectiveBillDay(b,now));
+  d.setHours(0,0,0,0);
+  return d;
 }
-function billDaysLeft(b){
-  const a=new Date();a.setHours(0,0,0,0);
-  return Math.round((dueForBill(b)-a)/86400000);
+function canPayBill(b){
+  if(isBillPaidThisMonth(b))return false;
+  const today0=new Date();today0.setHours(0,0,0,0);
+  return today0>=billDueDateThisMonth(b);
 }
-function billDueText(b){
-  const d=billDaysLeft(b);
-  if(d===0)return "Hari ini";
-  if(d===1)return "Besok";
-  return `${d} hari lagi`;
+function billStatusText(b){
+  if(isBillPaidThisMonth(b))return "Terbayar";
+  const today0=new Date();today0.setHours(0,0,0,0);
+  const due=billDueDateThisMonth(b);
+  const diff=Math.round((due-today0)/86400000);
+  if(diff>1)return `${diff} hari lagi`;
+  if(diff===1)return "Besok";
+  if(diff===0)return "Hari ini";
+  return "Belum dibayar";
 }
 function renderBills(){
   const list=$("billList");
   if(!list)return;
   fillBillSelects();
+
+  const total=(data.bills||[]).reduce((s,b)=>s+(Number(b.amount)||0),0);
+  const paid=(data.bills||[]).reduce((s,b)=>{
+    const p=billPaymentThisMonth(b);
+    return s+(p?Number(p.amount||b.amount||0):0);
+  },0);
+  const unpaid=Math.max(0,total-paid);
+
+  $("billMonthTotal").textContent=fmt.format(total);
+  $("billPaidTotal").textContent=fmt.format(paid);
+  $("billUnpaidTotal").textContent=fmt.format(unpaid);
+  $("billMonthCaption").textContent=`${data.bills.length} tagihan • ${monthKey()}`;
+
   if(!data.bills.length){
-    list.innerHTML=`<div class="card" style="padding:14px;font-size:10px;color:var(--muted)">Belum ada tagihan tetap.</div>`;
+    list.innerHTML=`<div class="card" style="padding:14px;font-size:10px;color:var(--muted)">Belum ada tagihan. Tekan tombol + untuk menambah.</div>`;
     return;
   }
-  const sorted=[...data.bills].sort((a,b)=>billDaysLeft(a)-billDaysLeft(b));
+
+  const sorted=[...data.bills].sort((a,b)=>(Number(a.day)||1)-(Number(b.day)||1));
   list.innerHTML=sorted.map(b=>{
     const wallet=data.wallets.find(w=>w.id===Number(b.walletId));
-    const left=billDaysLeft(b);
-    const badgeBg=left<=1?"var(--green-soft)":"#f3f3f3";
-    return `<div class="card" style="padding:12px;margin-bottom:8px">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+    const paidNow=isBillPaidThisMonth(b);
+    const payment=billPaymentThisMonth(b);
+    const canPay=canPayBill(b);
+    const displayAmount=paidNow&&payment?Number(payment.amount||b.amount||0):Number(b.amount||0);
+
+    let action="";
+    if(paidNow){
+      action=`<button class="btn secondary bill-paid-btn grow" type="button" disabled>Terbayar</button>`;
+    }else if(canPay){
+      action=`<button class="btn primary grow" type="button" onclick="payBill('${b.id}')">Bayar</button>`;
+    }else{
+      action=`<div class="bill-waiting">Tombol Bayar muncul tanggal ${effectiveBillDay(b)}</div>`;
+    }
+
+    return `<div class="card bill-item">
+      <div class="bill-item-top">
         <div style="min-width:0">
-          <div style="font-size:11px;font-weight:800">${esc(b.name)}</div>
-          <div style="font-size:9px;color:var(--muted);margin-top:3px">${esc(wallet?.name||"Dompet")} • tanggal ${Number(b.day)||1}</div>
+          <div class="bill-item-name">${esc(b.name)}</div>
+          <div class="bill-item-meta">${esc(wallet?.name||"Dompet")} • jatuh tempo tanggal ${Number(b.day)||1}</div>
         </div>
-        <span style="font-size:8.5px;font-weight:800;padding:4px 7px;border-radius:999px;background:${badgeBg};white-space:nowrap">${billDueText(b)}</span>
+        <span class="bill-badge ${paidNow?"paid":""}">${billStatusText(b)}</span>
       </div>
-      <div style="font-size:18px;font-weight:800;margin-top:10px">${fmt.format(Number(b.amount)||0)}</div>
-      <div style="display:flex;gap:7px;margin-top:10px">
-        <button class="btn primary grow" type="button" onclick="payBill('${b.id}')">Bayar</button>
-        <button class="btn secondary" type="button" onclick="editBill('${b.id}')">Edit</button>
-        <button class="btn secondary" type="button" onclick="deleteBill('${b.id}')">Hapus</button>
+      <div class="bill-amount">${fmt.format(displayAmount)}</div>
+      <div class="bill-actions">
+        ${action}
+        <button class="btn secondary" type="button" onclick="openBillModal('${b.id}')">Edit</button>
       </div>
     </div>`;
   }).join("");
@@ -945,13 +1092,23 @@ function renderBills(){
 function payBill(id){
   const b=data.bills.find(x=>String(x.id)===String(id));
   if(!b)return;
+  if(isBillPaidThisMonth(b)){
+    alert("Tagihan bulan ini sudah terbayar.");
+    return;
+  }
+  if(!canPayBill(b)){
+    alert(`Tagihan ini baru bisa dibayar mulai tanggal ${effectiveBillDay(b)}.`);
+    return;
+  }
+
   const raw=prompt(`Nominal ${b.name} bulan ini:`,Number(b.amount||0).toLocaleString("id-ID"));
   if(raw===null)return;
   const amount=moneyNumber(raw);
   if(amount<=0){alert("Nominal harus lebih dari 0.");return}
 
+  const txId=data.nextTx++;
   data.tx.push({
-    id:data.nextTx++,
+    id:txId,
     type:"EXPENSE",
     amount,
     walletId:Number(b.walletId),
@@ -960,12 +1117,17 @@ function payBill(id){
     note:b.note?`${b.name} • ${b.note}`:b.name
   });
 
-  // nominal terbaru dijadikan nominal default berikutnya, jadi tetap fleksibel.
+  if(!b.payments||typeof b.payments!=="object")b.payments={};
+  b.payments[monthKey()]={
+    amount,
+    paidAt:new Date().toISOString(),
+    txId
+  };
+
+  // Nominal terakhir menjadi default bulan selanjutnya.
   b.amount=amount;
-  b.lastPaid=today();
   save();
   refresh();
-  alert("Tagihan sudah dicatat sebagai pengeluaran.");
 }
 async function enableBillNotifications(){
   if(!("Notification" in window)){
@@ -974,7 +1136,7 @@ async function enableBillNotifications(){
   }
   const permission=await Notification.requestPermission();
   if(permission==="granted"){
-    alert("Pengingat H-1 aktif. Saat Dompet Lokal dibuka pada H-1, notifikasi akan ditampilkan.");
+    alert("Pengingat H-1 aktif.");
     maybeBillNotifications();
   }else{
     alert("Izin notifikasi belum diberikan.");
@@ -982,10 +1144,17 @@ async function enableBillNotifications(){
 }
 async function maybeBillNotifications(){
   if(!("Notification" in window)||Notification.permission!=="granted")return;
+  const today0=new Date();today0.setHours(0,0,0,0);
+
   for(const b of data.bills){
-    if(billDaysLeft(b)!==1)continue;
-    const key=`dompet-lokal-bill-${today()}-${b.id}`;
+    if(isBillPaidThisMonth(b))continue;
+    const due=billDueDateThisMonth(b);
+    const diff=Math.round((due-today0)/86400000);
+    if(diff!==1)continue;
+
+    const key=`dompet-lokal-bill-${monthKey()}-${b.id}`;
     if(localStorage.getItem(key))continue;
+
     try{
       const registration=await navigator.serviceWorker?.ready;
       const body=`Besok waktunya bayar ${b.name} • ${fmt.format(Number(b.amount)||0)}`;
@@ -1082,7 +1251,7 @@ $("deleteWalletBtn").onclick=()=>{
 function backup(){
   const payload={
     app:"Dompet Lokal",
-    version:"11.3.1",
+    version:"11.4",
     exportedAt:new Date().toISOString(),
     data
   };
