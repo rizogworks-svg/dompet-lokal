@@ -512,11 +512,10 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
         <div id="reportCategories" class="category-report"></div>
 
         <div class="section-head">
-          <h3>Budget bulanan</h3>
+          <h3></h3>
           <button class="link-btn" onclick="setBudget()">Atur</button>
         </div>
         <div class="card budget-card">
-          <div id="budgetText" class="budget-text">Rp0 / Rp0</div>
           <div class="budget-bar"><i id="budgetBar" style="width:0%"></i></div>
         </div>
 
@@ -591,7 +590,7 @@ const moneyFormatInput=v=>{const d=moneyDigits(v);return d?Number(d).toLocaleStr
 function bindMoneyInput(input){input.addEventListener("input",()=>{const old=input.value;const pos=input.selectionStart||old.length;const digitsBefore=old.slice(0,pos).replace(/\D/g,"").length;input.value=moneyFormatInput(old);let seen=0,newPos=input.value.length;for(let i=0;i<input.value.length;i++){if(/\d/.test(input.value[i]))seen++;if(seen>=digitsBefore){newPos=i+1;break;}}try{input.setSelectionRange(newPos,newPos)}catch(e){}});input.addEventListener("focus",()=>{if(input.value==="0")input.value=""});input.addEventListener("blur",()=>{if(input.value==="")input.value="0"});}
 function setMoneyInput(input,val){input.value=moneyFormatInput(val||0)||"0"}
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function defaultData(){return{wallets:[{id:1,name:"Dompet Utama",opening:0},{id:2,name:"Tabungan",opening:0},{id:3,name:"Dana Darurat",opening:0}],categories:{EXPENSE:["Belanja","Makan & Minum","Transportasi","Tagihan","Hiburan","Kesehatan","Lainnya"],INCOME:["Gaji","Bonus","Freelance","Usaha","Lainnya"]},tx:[],budget:0,nextWallet:4,nextTx:1}}
+function defaultData(){return{wallets:[{id:1,name:"Dompet Utama",opening:0},{id:2,name:"Tabungan",opening:0},{id:3,name:"Dana Darurat",opening:0}],categories:{EXPENSE:["Belanja","Makan & Minum","Transportasi","Tagihan","Hiburan","Kesehatan","Lainnya"],INCOME:["Gaji","Bonus","Freelance","Usaha","Lainnya"]},tx:[],budget:0,bills:[],nextWallet:4,nextTx:1}}
 let data=defaultData(), db=null, storageMode="indexeddb";
 function openDB(){return new Promise((resolve,reject)=>{if(!("indexedDB" in window)){reject(new Error("IndexedDB tidak didukung"));return;}const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const database=req.result;if(!database.objectStoreNames.contains(STORE_NAME))database.createObjectStore(STORE_NAME)};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error("Gagal membuka IndexedDB"));})}
 function idbGet(key){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,"readonly");const req=tx.objectStore(STORE_NAME).get(key);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
@@ -758,6 +757,161 @@ function renderReport(){
   $("budgetText").textContent=`${fmt.format(expense)} / ${fmt.format(data.budget)}`;
   $("budgetBar").style.width=pct+"%";
 }
+
+let editingBillId=null;
+
+function billDueDate(day){
+  const now=new Date();
+  let y=now.getFullYear(), m=now.getMonth();
+  let d=Math.max(1,Math.min(31,Number(day)||1));
+  let due=new Date(y,m,d);
+  if(due < new Date(y,m,now.getDate())){
+    m++;
+    if(m>11){m=0;y++}
+    due=new Date(y,m,d);
+  }
+  // clamp invalid dates (e.g. 31 Feb) to last day of month
+  if(due.getMonth()!==m){
+    due=new Date(y,m+1,0);
+  }
+  return due;
+}
+function daysUntil(date){
+  const a=new Date(); a.setHours(0,0,0,0);
+  const b=new Date(date); b.setHours(0,0,0,0);
+  return Math.round((b-a)/86400000);
+}
+function fillBillForm(){
+  const wallets=data.wallets||[];
+  $("billWallet").innerHTML=wallets.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join("");
+  const cats=(data.categories?.EXPENSE||[]);
+  $("billCategory").innerHTML=cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+}
+function saveBill(){
+  const name=$("billName").value.trim();
+  const amount=parseMoney($("billAmount").value);
+  const day=Math.max(1,Math.min(31,Number($("billDay").value)||1));
+  const walletId=$("billWallet").value;
+  const category=$("billCategory").value || "Lainnya";
+  const note=$("billNote").value.trim();
+  if(!name){alert("Nama tagihan belum diisi.");return}
+  if(amount<0){alert("Nominal tidak valid.");return}
+  if(!walletId){alert("Pilih dompet.");return}
+  if(editingBillId){
+    const b=data.bills.find(x=>x.id===editingBillId);
+    if(b) Object.assign(b,{name,amount,day,walletId,category,note});
+  }else{
+    data.bills.push({
+      id:"b"+Date.now(),
+      name,amount,day,walletId,category,note,
+      createdAt:new Date().toISOString()
+    });
+  }
+  editingBillId=null;
+  $("billName").value="";
+  setMoneyInput($("billAmount"),0);
+  $("billDay").value="1";
+  $("billNote").value="";
+  save();refresh();
+}
+function editBill(id){
+  const b=data.bills.find(x=>x.id===id); if(!b)return;
+  editingBillId=id;
+  $("billName").value=b.name;
+  setMoneyInput($("billAmount"),b.amount||0);
+  $("billDay").value=b.day||1;
+  $("billWallet").value=b.walletId||"";
+  $("billCategory").value=b.category||"";
+  $("billNote").value=b.note||"";
+  go("bills");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function deleteBill(id){
+  const b=data.bills.find(x=>x.id===id); if(!b)return;
+  if(confirm(`Hapus tagihan "${b.name}"?`)){
+    data.bills=data.bills.filter(x=>x.id!==id);
+    save();refresh();
+  }
+}
+function payBill(id){
+  const b=data.bills.find(x=>x.id===id); if(!b)return;
+  const amount=prompt(`Nominal ${b.name} bulan ini:`,formatMoneyPlain(b.amount||0));
+  if(amount===null)return;
+  const value=parseMoney(amount);
+  if(value<=0){alert("Nominal tidak valid.");return}
+  const due=billDueDate(b.day);
+  const tx={
+    id:"t"+Date.now(),
+    type:"EXPENSE",
+    amount:value,
+    walletId:b.walletId,
+    category:b.category||"Lainnya",
+    date:today(),
+    note:b.note?`${b.name} • ${b.note}`:b.name
+  };
+  data.tx.unshift(tx);
+  b.amount=value; // nominal tetap bisa berubah per bulan dan jadi nilai terbaru
+  b.lastPaid=today();
+  save();refresh();
+  alert("Tagihan dicatat sebagai pengeluaran.");
+}
+function renderBills(){
+  const el=$("billList"); if(!el)return;
+  fillBillForm();
+  if(!data.bills?.length){
+    el.innerHTML=`<div class="card" style="padding:14px;font-size:10px;color:var(--muted)">Belum ada tagihan tetap.</div>`;
+    return;
+  }
+  el.innerHTML=data.bills.map(b=>{
+    const due=billDueDate(b.day);
+    const du=daysUntil(due);
+    let badge=du===0?"Hari ini":du===1?"Besok":`${du} hari lagi`;
+    const wallet=data.wallets.find(w=>w.id===b.walletId);
+    return `<div class="card" style="padding:12px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+        <div style="min-width:0">
+          <div style="font-size:11px;font-weight:800">${esc(b.name)}</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:3px">${wallet?esc(wallet.name):"Dompet"} • tgl ${b.day} tiap bulan</div>
+        </div>
+        <span style="font-size:8.5px;font-weight:800;padding:4px 7px;border-radius:999px;background:${du<=1?'var(--green-soft)':'#f3f3f3'}">${badge}</span>
+      </div>
+      <div style="font-size:18px;font-weight:800;margin-top:10px">${formatMoney(b.amount||0)}</div>
+      <div style="display:flex;gap:7px;margin-top:10px">
+        <button class="btn primary" style="flex:1" onclick="payBill('${b.id}')">Bayar</button>
+        <button class="btn secondary" style="flex:1" onclick="editBill('${b.id}')">Edit</button>
+        <button class="btn secondary" onclick="deleteBill('${b.id}')">Hapus</button>
+      </div>
+    </div>`
+  }).join("");
+}
+async function enableBillNotifications(){
+  if(!("Notification" in window)){alert("Perangkat ini tidak mendukung notifikasi web.");return}
+  const p=await Notification.requestPermission();
+  if(p==="granted"){alert("Pengingat diaktifkan. Dompet Lokal akan mengingatkan saat aplikasi dibuka H-1 sebelum jatuh tempo.");maybeBillNotifications()}
+  else alert("Izin notifikasi belum diberikan.");
+}
+async function maybeBillNotifications(){
+  if(!("Notification" in window) || Notification.permission!=="granted") return;
+  const todayKey=today();
+  for(const b of data.bills||[]){
+    const due=billDueDate(b.day);
+    if(daysUntil(due)===1){
+      const key=`bill-notified-${todayKey}-${b.id}`;
+      if(localStorage.getItem(key)) continue;
+      try{
+        const reg=await navigator.serviceWorker?.ready;
+        if(reg) await reg.showNotification("Dompet Lokal",{
+          body:`Besok waktunya bayar ${b.name} (${formatMoney(b.amount||0)})`,
+          icon:"./icon-192.png",
+          badge:"./icon-192.png"
+        });
+        else new Notification("Dompet Lokal",{body:`Besok waktunya bayar ${b.name}`});
+        localStorage.setItem(key,"1");
+      }catch(e){}
+    }
+  }
+}
+
 function refresh(){populateSelects();renderHome();renderHistory();renderWallets();renderReport()}
 function newTx(type="EXPENSE"){
   $("txForm").reset();
@@ -838,9 +992,6 @@ $("deleteWalletBtn").onclick=()=>{
     save();walletDialog.close();refresh();
   }
 };
-function setBudget(){
-  const v=prompt("Masukkan budget bulanan:",moneyFormatInput(data.budget||0));
-  if(v!==null){data.budget=Math.max(0,moneyNumber(v));save();refresh();}
 }
 function backup(){
   const payload={
