@@ -1,4 +1,25 @@
 {
-  "name":"Dompet Lokal","short_name":"Dompet Lokal","description":"Pencatat pemasukan dan pengeluaran pribadi dengan data lokal di perangkat.","lang":"id-ID","start_url":"./","scope":"./","display":"standalone","background_color":"#f4f4f4","theme_color":"#8fa88a",
-  "icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]
+  "name": "Dompet Lokal",
+  "short_name": "Dompet Lokal",
+  "description": "Pencatat pemasukan, pengeluaran, dompet, dan laporan yang tersimpan lokal di perangkat.",
+  "lang": "id-ID",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f4f4",
+  "theme_color": "#8fa88a",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }

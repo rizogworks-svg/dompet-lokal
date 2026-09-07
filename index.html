@@ -520,12 +520,30 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
           <div class="budget-bar"><i id="budgetBar" style="width:0%"></i></div>
         </div>
 
+        <div class="section-head"><h3>Aplikasi</h3></div>
+        <div class="card form-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+            <div>
+              <div style="font-size:10.5px;font-weight:700">Penyimpanan</div>
+              <div id="storageStatus" style="font-size:9px;color:var(--muted);margin-top:3px">Memeriksa...</div>
+            </div>
+            <span id="storageBadge" style="font-size:8.5px;font-weight:700;padding:5px 8px;border-radius:999px;background:var(--green-soft)">LOCAL</span>
+          </div>
+          <button id="installBtn" class="btn primary hidden" type="button" onclick="installApp()">Install Dompet Lokal</button>
+          <div id="installedText" class="hidden" style="font-size:9.5px;color:var(--muted);line-height:1.5">
+            Dompet Lokal sudah terpasang sebagai aplikasi.
+          </div>
+        </div>
+
         <div class="section-head"><h3>Data</h3></div>
         <div class="card form-card">
           <div class="form-actions" style="margin-top:0;flex-direction:column">
             <button class="btn secondary" type="button" onclick="backup()">Backup Data</button>
-            <label class="btn secondary" style="display:grid;place-items:center">Restore Data<input id="restore" type="file" accept=".json" hidden></label>
+            <label class="btn secondary" style="display:grid;place-items:center">Restore Data<input id="restore" type="file" accept=".json,application/json" hidden></label>
             <button class="btn secondary" type="button" onclick="exportCsv()">Ekspor CSV</button>
+          </div>
+          <div style="font-size:8.8px;line-height:1.5;color:var(--muted);margin-top:10px">
+            Backup menyimpan dompet, transaksi, kategori, dan budget ke file JSON. Simpan file backup di tempat aman.
           </div>
         </div>
       </section>
@@ -825,18 +843,35 @@ function setBudget(){
   if(v!==null){data.budget=Math.max(0,moneyNumber(v));save();refresh();}
 }
 function backup(){
+  const payload={
+    app:"Dompet Lokal",
+    version:"11.2",
+    exportedAt:new Date().toISOString(),
+    data
+  };
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
+  const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}));
+  a.href=url;
   a.download=`dompet-lokal-backup-${today()}.json`;
-  a.click();URL.revokeObjectURL(a.href);
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 $("restore").onchange=async()=>{
   const f=$("restore").files?.[0];if(!f)return;
   try{
-    const d=JSON.parse(await f.text());
-    if(!d.wallets||!d.tx)throw 0;
-    if(confirm("Ganti semua data saat ini?")){data=d;save();refresh();alert("Restore selesai.");}
-  }catch(e){alert("File backup tidak valid.");}
+    const parsed=JSON.parse(await f.text());
+    const d=parsed?.data && parsed.app==="Dompet Lokal" ? parsed.data : parsed;
+    if(!d || !Array.isArray(d.wallets) || !Array.isArray(d.tx) || typeof d!=="object")throw new Error("invalid");
+    if(!d.categories || !Array.isArray(d.categories.EXPENSE) || !Array.isArray(d.categories.INCOME))throw new Error("invalid");
+    if(confirm(`Restore ${d.wallets.length} dompet dan ${d.tx.length} transaksi? Data saat ini akan diganti.`)){
+      data=d;
+      await save();
+      refresh();
+      alert("Restore selesai dan sudah disimpan.");
+    }
+  }catch(e){alert("File backup tidak valid atau rusak.");}
   $("restore").value="";
 };
 function exportCsv(){
@@ -849,7 +884,72 @@ function exportCsv(){
   a.click();URL.revokeObjectURL(a.href);
 }
 function tickClock(){const d=new Date();$("clock").textContent=`${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`}
-async function startApp(){await initStorage();document.querySelectorAll('[data-money="true"]').forEach(bindMoneyInput);setMoneyInput($("walletOpening"),0);$("reportMonth").value=today().slice(0,7);$("date").value=today();tickClock();setInterval(tickClock,60000);refresh();if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}}
+
+let deferredInstallPrompt=null;
+function isStandalone(){
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone===true;
+}
+function updateInstallUI(){
+  const btn=$("installBtn"), installed=$("installedText");
+  if(!btn||!installed)return;
+  if(isStandalone()){
+    btn.classList.add("hidden");
+    installed.classList.remove("hidden");
+  }else if(deferredInstallPrompt){
+    btn.classList.remove("hidden");
+    installed.classList.add("hidden");
+  }else{
+    btn.classList.add("hidden");
+    installed.classList.add("hidden");
+  }
+}
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  updateInstallUI();
+});
+window.addEventListener("appinstalled",()=>{
+  deferredInstallPrompt=null;
+  updateInstallUI();
+});
+async function installApp(){
+  if(!deferredInstallPrompt){
+    alert("Kalau tombol install belum tersedia, buka menu Chrome lalu pilih Tambahkan ke layar utama / Install app.");
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  try{await deferredInstallPrompt.userChoice}catch(e){}
+  deferredInstallPrompt=null;
+  updateInstallUI();
+}
+function updateStorageStatus(){
+  const el=$("storageStatus");
+  if(!el)return;
+  el.textContent=storageMode==="indexeddb"
+    ?"IndexedDB aktif • data tersimpan di perangkat ini"
+    :"Mode cadangan localStorage • data tetap lokal";
+}
+
+async function startApp(){
+  await initStorage();
+  document.querySelectorAll('[data-money="true"]').forEach(bindMoneyInput);
+  setMoneyInput($("walletOpening"),0);
+  $("reportMonth").value=today().slice(0,7);
+  $("date").value=today();
+  tickClock();
+  setInterval(tickClock,60000);
+  refresh();
+  updateStorageStatus();
+  updateInstallUI();
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",async()=>{
+      try{
+        const reg=await navigator.serviceWorker.register("./sw.js");
+        reg.update().catch(()=>{});
+      }catch(e){}
+    });
+  }
+}
 startApp();
 </script>
 </body>
