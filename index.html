@@ -337,6 +337,39 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
   background:#fff;font-size:18px;line-height:1;padding:0
 }
 
+
+/* ===== Tagihan Dashboard v11.5 ===== */
+.bill-nearest{
+  padding:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:linear-gradient(180deg,#ffffff,#f6f8f5);
+}
+.bill-nearest-left{min-width:0}
+.bill-nearest-label{font-size:8.5px;color:var(--muted);font-weight:700}
+.bill-nearest-name{font-size:11.5px;font-weight:800;margin-top:3px}
+.bill-nearest-meta{font-size:8.7px;color:var(--muted);margin-top:3px}
+.bill-nearest-amount{font-size:14px;font-weight:800;white-space:nowrap}
+.bill-item.urgent{
+  border-color:#b9c8b4;
+  box-shadow:0 0 0 2px rgba(143,168,138,.08);
+}
+.bill-item.paid{
+  opacity:.72;
+  background:#fafafa;
+}
+.bill-badge.today{background:var(--green-soft);color:#111}
+.bill-badge.tomorrow{background:#edf3ea;color:#111}
+.bill-badge.overdue{background:#f7e6e3;color:#7c3b36}
+.bill-badge.upcoming{background:#f3f3f3;color:#555}
+.bill-badge.paid{background:#e4eee0;color:#36523b}
+.bill-item.paid .bill-amount{text-decoration:none}
+.bill-empty-note{
+  padding:14px;text-align:center;font-size:9.5px;color:var(--muted);line-height:1.5
+}
+
 </style>
 </head>
 <body>
@@ -577,6 +610,15 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
               <small>Belum Dibayar</small>
               <b id="billUnpaidTotal">Rp0</b>
             </div>
+          </div>
+
+          <div id="billNearestCard" class="card bill-nearest">
+            <div class="bill-nearest-left">
+              <div class="bill-nearest-label">Tagihan Terdekat</div>
+              <div class="bill-nearest-name" id="billNearestName">Belum ada</div>
+              <div class="bill-nearest-meta" id="billNearestMeta">Tambahkan tagihan pertama</div>
+            </div>
+            <div class="bill-nearest-amount" id="billNearestAmount">Rp0</div>
           </div>
 
           <div class="section-head"><h3>Daftar Tagihan</h3></div>
@@ -1024,15 +1066,52 @@ function canPayBill(b){
   const today0=new Date();today0.setHours(0,0,0,0);
   return today0>=billDueDateThisMonth(b);
 }
-function billStatusText(b){
-  if(isBillPaidThisMonth(b))return "Terbayar";
+
+function billStatusInfo(b){
+  if(isBillPaidThisMonth(b))return {text:"Terbayar",cls:"paid"};
   const today0=new Date();today0.setHours(0,0,0,0);
   const due=billDueDateThisMonth(b);
   const diff=Math.round((due-today0)/86400000);
-  if(diff>1)return `${diff} hari lagi`;
-  if(diff===1)return "Besok";
-  if(diff===0)return "Hari ini";
-  return "Belum dibayar";
+
+  if(diff>1)return {text:`${diff} hari lagi`,cls:"upcoming"};
+  if(diff===1)return {text:"Besok",cls:"tomorrow"};
+  if(diff===0)return {text:"Hari ini",cls:"today"};
+  return {text:"Lewat jatuh tempo",cls:"overdue"};
+}
+function renderNearestBill(){
+  const nameEl=$("billNearestName");
+  const metaEl=$("billNearestMeta");
+  const amountEl=$("billNearestAmount");
+  const card=$("billNearestCard");
+  if(!nameEl||!metaEl||!amountEl||!card)return;
+
+  const unpaid=(data.bills||[])
+    .filter(b=>!isBillPaidThisMonth(b))
+    .sort((a,b)=>{
+      const da=billDueDateThisMonth(a).getTime();
+      const db=billDueDateThisMonth(b).getTime();
+      return da-db;
+    });
+
+  if(!unpaid.length){
+    nameEl.textContent=data.bills.length?"Semua sudah terbayar":"Belum ada tagihan";
+    metaEl.textContent=data.bills.length?"Bulan ini aman":"Tekan + untuk menambah tagihan";
+    amountEl.textContent="Rp0";
+    card.classList.remove("urgent");
+    return;
+  }
+
+  const b=unpaid[0];
+  const info=billStatusInfo(b);
+  nameEl.textContent=b.name;
+  metaEl.textContent=`${info.text} • tanggal ${Number(b.day)||1}`;
+  amountEl.textContent=fmt.format(Number(b.amount)||0);
+
+  if(info.cls==="today"||info.cls==="tomorrow"||info.cls==="overdue"){
+    card.classList.add("urgent");
+  }else{
+    card.classList.remove("urgent");
+  }
 }
 function renderBills(){
   const list=$("billList");
@@ -1051,18 +1130,31 @@ function renderBills(){
   $("billUnpaidTotal").textContent=fmt.format(unpaid);
   $("billMonthCaption").textContent=`${data.bills.length} tagihan • ${monthKey()}`;
 
+  renderNearestBill();
+
   if(!data.bills.length){
-    list.innerHTML=`<div class="card" style="padding:14px;font-size:10px;color:var(--muted)">Belum ada tagihan. Tekan tombol + untuk menambah.</div>`;
+    list.innerHTML=`<div class="card bill-empty-note">Belum ada tagihan.<br>Tekan tombol + di atas untuk menambah tagihan pertama.</div>`;
     return;
   }
 
-  const sorted=[...data.bills].sort((a,b)=>(Number(a.day)||1)-(Number(b.day)||1));
+  const sorted=[...data.bills].sort((a,b)=>{
+    const pa=isBillPaidThisMonth(a), pb=isBillPaidThisMonth(b);
+    if(pa!==pb)return pa?1:-1;
+
+    const da=billDueDateThisMonth(a).getTime();
+    const db=billDueDateThisMonth(b).getTime();
+    if(da!==db)return da-db;
+
+    return String(a.name||"").localeCompare(String(b.name||""),"id");
+  });
+
   list.innerHTML=sorted.map(b=>{
     const wallet=data.wallets.find(w=>w.id===Number(b.walletId));
     const paidNow=isBillPaidThisMonth(b);
     const payment=billPaymentThisMonth(b);
     const canPay=canPayBill(b);
     const displayAmount=paidNow&&payment?Number(payment.amount||b.amount||0):Number(b.amount||0);
+    const status=billStatusInfo(b);
 
     let action="";
     if(paidNow){
@@ -1070,16 +1162,22 @@ function renderBills(){
     }else if(canPay){
       action=`<button class="btn primary grow" type="button" onclick="payBill('${b.id}')">Bayar</button>`;
     }else{
-      action=`<div class="bill-waiting">Tombol Bayar muncul tanggal ${effectiveBillDay(b)}</div>`;
+      action=`<div class="bill-waiting">Bayar tersedia tanggal ${effectiveBillDay(b)}</div>`;
     }
 
-    return `<div class="card bill-item">
+    const itemClasses=[
+      "card","bill-item",
+      paidNow?"paid":"",
+      (!paidNow&&(status.cls==="today"||status.cls==="tomorrow"||status.cls==="overdue"))?"urgent":""
+    ].filter(Boolean).join(" ");
+
+    return `<div class="${itemClasses}">
       <div class="bill-item-top">
         <div style="min-width:0">
           <div class="bill-item-name">${esc(b.name)}</div>
           <div class="bill-item-meta">${esc(wallet?.name||"Dompet")} • jatuh tempo tanggal ${Number(b.day)||1}</div>
         </div>
-        <span class="bill-badge ${paidNow?"paid":""}">${billStatusText(b)}</span>
+        <span class="bill-badge ${status.cls}">${status.text}</span>
       </div>
       <div class="bill-amount">${fmt.format(displayAmount)}</div>
       <div class="bill-actions">
@@ -1089,6 +1187,7 @@ function renderBills(){
     </div>`;
   }).join("");
 }
+
 function payBill(id){
   const b=data.bills.find(x=>String(x.id)===String(id));
   if(!b)return;
@@ -1251,7 +1350,7 @@ $("deleteWalletBtn").onclick=()=>{
 function backup(){
   const payload={
     app:"Dompet Lokal",
-    version:"11.4",
+    version:"11.5",
     exportedAt:new Date().toISOString(),
     data
   };
