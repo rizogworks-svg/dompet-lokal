@@ -473,7 +473,15 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
           <small>Total aset bersih</small>
           <b id="walletTotal">Rp0</b>
         </div>
-        <div id="walletList" class="wallet-list" style="margin-top:8px"></div>
+
+        <button
+          type="button"
+          class="btn primary"
+          onclick="openWallet()"
+          style="width:100%;margin-top:10px;min-height:42px;font-size:10.5px"
+        >+ Tambah Dompet</button>
+
+        <div id="walletList" class="wallet-list" style="margin-top:10px"></div>
       </section>
 
       <section id="report" class="page">
