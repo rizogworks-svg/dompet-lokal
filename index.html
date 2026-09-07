@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4f4f4">
+<meta name="description" content="Pencatat pemasukan dan pengeluaran pribadi, tersimpan lokal di perangkat.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
 <title>Dompet Lokal</title>
 <style>
 :root{
@@ -550,52 +554,25 @@ dialog::backdrop{background:rgba(25,23,20,.24)}
 </dialog>
 
 <script>
-const KEY="dompet_lokal_v10_4_no_top_right_icons";
+const LEGACY_KEYS=["dompet_lokal_v10_4_no_top_right_icons","dompet_lokal_v10_3_topicon_fix","dompet_lokal_v10_2_clean_status","dompet_lokal_v10_1_dropdown_fix","dompet_lokal_v10_minimal_sage","dompet_lokal_v9_1_sidebar"];
+const DB_NAME="dompet_lokal_db", DB_VERSION=1, STORE_NAME="app", STATE_KEY="state";
 const fmt=new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0});
 const $=id=>document.getElementById(id);
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
 const moneyDigits=v=>String(v??"").replace(/\D/g,"");
 const moneyNumber=v=>Number(moneyDigits(v)||0);
 const moneyFormatInput=v=>{const d=moneyDigits(v);return d?Number(d).toLocaleString("id-ID"):""};
-function bindMoneyInput(input){
-  input.addEventListener("input",()=>{
-    const old=input.value;
-    const pos=input.selectionStart||old.length;
-    const digitsBefore=old.slice(0,pos).replace(/\D/g,"").length;
-    input.value=moneyFormatInput(old);
-    let seen=0,newPos=input.value.length;
-    for(let i=0;i<input.value.length;i++){
-      if(/\d/.test(input.value[i]))seen++;
-      if(seen>=digitsBefore){newPos=i+1;break;}
-    }
-    try{input.setSelectionRange(newPos,newPos)}catch(e){}
-  });
-  input.addEventListener("focus",()=>{if(input.value==="0")input.value=""});
-  input.addEventListener("blur",()=>{if(input.value==="")input.value="0"});
-}
+function bindMoneyInput(input){input.addEventListener("input",()=>{const old=input.value;const pos=input.selectionStart||old.length;const digitsBefore=old.slice(0,pos).replace(/\D/g,"").length;input.value=moneyFormatInput(old);let seen=0,newPos=input.value.length;for(let i=0;i<input.value.length;i++){if(/\d/.test(input.value[i]))seen++;if(seen>=digitsBefore){newPos=i+1;break;}}try{input.setSelectionRange(newPos,newPos)}catch(e){}});input.addEventListener("focus",()=>{if(input.value==="0")input.value=""});input.addEventListener("blur",()=>{if(input.value==="")input.value="0"});}
 function setMoneyInput(input,val){input.value=moneyFormatInput(val||0)||"0"}
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let data=load();
-
-function load(){
-  try{
-    const d=JSON.parse(localStorage.getItem(KEY));
-    if(d&&d.wallets&&d.tx)return d;
-  }catch(e){}
-  return{
-    wallets:[
-      {id:1,name:"Dompet Utama",opening:0},
-      {id:2,name:"Tabungan",opening:0},
-      {id:3,name:"Dana Darurat",opening:0}
-    ],
-    categories:{
-      EXPENSE:["Belanja","Makan & Minum","Transportasi","Tagihan","Hiburan","Kesehatan","Lainnya"],
-      INCOME:["Gaji","Bonus","Freelance","Usaha","Lainnya"]
-    },
-    tx:[],budget:0,nextWallet:4,nextTx:1
-  }
-}
-function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function defaultData(){return{wallets:[{id:1,name:"Dompet Utama",opening:0},{id:2,name:"Tabungan",opening:0},{id:3,name:"Dana Darurat",opening:0}],categories:{EXPENSE:["Belanja","Makan & Minum","Transportasi","Tagihan","Hiburan","Kesehatan","Lainnya"],INCOME:["Gaji","Bonus","Freelance","Usaha","Lainnya"]},tx:[],budget:0,nextWallet:4,nextTx:1}}
+let data=defaultData(), db=null, storageMode="indexeddb";
+function openDB(){return new Promise((resolve,reject)=>{if(!("indexedDB" in window)){reject(new Error("IndexedDB tidak didukung"));return;}const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const database=req.result;if(!database.objectStoreNames.contains(STORE_NAME))database.createObjectStore(STORE_NAME)};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error("Gagal membuka IndexedDB"));})}
+function idbGet(key){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,"readonly");const req=tx.objectStore(STORE_NAME).get(key);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+function idbSet(key,value){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,"readwrite");tx.objectStore(STORE_NAME).put(value,key);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)})}
+function readLegacyData(){for(const key of LEGACY_KEYS){try{const raw=localStorage.getItem(key);if(!raw)continue;const d=JSON.parse(raw);if(d&&Array.isArray(d.wallets)&&Array.isArray(d.tx))return d}catch(e){}}return null}
+async function initStorage(){try{db=await openDB();const stored=await idbGet(STATE_KEY);if(stored&&Array.isArray(stored.wallets)&&Array.isArray(stored.tx)){data=stored;return}const legacy=readLegacyData();if(legacy){data=legacy;await idbSet(STATE_KEY,data);return}data=defaultData();await idbSet(STATE_KEY,data)}catch(e){storageMode="localstorage";data=readLegacyData()||defaultData()}}
+async function save(){try{if(storageMode==="indexeddb"&&db){await idbSet(STATE_KEY,data);return}localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data))}catch(e){try{localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data))}catch(_){}}}
 function dateLabel(s){return new Intl.DateTimeFormat("id-ID",{day:"numeric",month:"short",year:"numeric"}).format(new Date(s+"T12:00:00"))}
 function monthLabel(s){const[y,m]=s.split("-");return new Intl.DateTimeFormat("id-ID",{month:"long",year:"numeric"}).format(new Date(+y,+m-1,1))}
 function niceToday(){return new Intl.DateTimeFormat("id-ID",{weekday:"long",day:"numeric",month:"long"}).format(new Date())}
@@ -864,12 +841,8 @@ function exportCsv(){
   a.click();URL.revokeObjectURL(a.href);
 }
 function tickClock(){const d=new Date();$("clock").textContent=`${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`}
-document.querySelectorAll('[data-money="true"]').forEach(bindMoneyInput);
-setMoneyInput($("walletOpening"),0);
-$("reportMonth").value=today().slice(0,7);
-$("date").value=today();
-tickClock();setInterval(tickClock,60000);
-refresh();
+async function startApp(){await initStorage();document.querySelectorAll('[data-money="true"]').forEach(bindMoneyInput);setMoneyInput($("walletOpening"),0);$("reportMonth").value=today().slice(0,7);$("date").value=today();tickClock();setInterval(tickClock,60000);refresh();if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}}
+startApp();
 </script>
 </body>
 </html>
