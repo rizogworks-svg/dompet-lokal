@@ -122,24 +122,6 @@ button{cursor:pointer}
 .history-item{padding:10px;background:var(--surface-soft);border-radius:12px;margin-bottom:7px;font-size:8.5px}.history-item:last-child{margin-bottom:0}
 @media(max-width:360px){.quick-label{font-size:8px}.wallet-grid{grid-template-columns:1fr}.balance-value{font-size:30px}}
 
-/* ===== Collapsible Setting Cards ===== */
-.setting-card.collapsible .setting-collapse-head{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:14px;
-}
-.setting-card.collapsible .setting-collapse-head .setting-title{padding:0;margin:0}
-.setting-toggle{
-  width:32px;height:32px;border-radius:50%;
-  border:1px solid var(--line);background:var(--surface-soft);
-  display:grid;place-items:center;padding:0;flex:0 0 32px;
-}
-.setting-toggle svg{width:15px;height:15px;stroke-width:1.8;transition:transform .18s ease}
-.setting-card.collapsible.collapsed .setting-toggle svg{transform:rotate(-90deg)}
-.setting-card.collapsible .setting-collapse-body{display:block}
-.setting-card.collapsible.collapsed .setting-collapse-body{display:none}
-.setting-card.collapsible.collapsed .setting-collapse-head{padding-bottom:14px}
-
-
 /* ===== Wallet Visibility Eye ===== */
 .wallet-eye{
   position:absolute;right:10px;top:10px;
@@ -205,6 +187,58 @@ button{cursor:pointer}
 }
 .quick-add-choice:active{
   transform:scale(.98);
+}
+
+
+/* ===== Native Setting Dropbar ===== */
+.setting-drop{
+  overflow:hidden;
+}
+.setting-drop > summary{
+  list-style:none;
+}
+.setting-drop > summary::-webkit-details-marker{
+  display:none;
+}
+.setting-drop-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:14px;
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.setting-drop-head .setting-title{
+  padding:0;
+  margin:0;
+}
+.setting-drop-arrow{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:var(--surface-soft);
+  display:grid;
+  place-items:center;
+  flex:0 0 32px;
+}
+.setting-drop-arrow svg{
+  width:15px;
+  height:15px;
+  stroke-width:1.8;
+  transition:transform .18s ease;
+}
+.setting-drop:not([open]) .setting-drop-arrow svg{
+  transform:rotate(-90deg);
+}
+.setting-drop-body{
+  display:block;
+  overflow:hidden;
+}
+.setting-drop:not([open]) .setting-drop-body{
+  display:none !important;
 }
 
 </style>
@@ -284,77 +318,78 @@ button{cursor:pointer}
   </div>
 </section>
 
+
 <section id="setting" class="page">
 
-  <div class="setting-card collapsible" data-setting-card="theme">
-    <div class="setting-collapse-head">
-      <div class="setting-title" data-i18n="theme">Tema</div>
-      <button class="setting-toggle" type="button" onclick="toggleSettingCard('theme')" aria-label="Minimize">
+  <details class="setting-card setting-drop" data-setting-key="theme" open>
+    <summary class="setting-drop-head">
+      <span class="setting-title" data-i18n="theme">Tema</span>
+      <span class="setting-drop-arrow">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-    </div>
-    <div class="setting-collapse-body">
+      </span>
+    </summary>
+    <div class="setting-drop-body">
       <div class="setting-sub" data-i18n="themeSub">Pilih satu dari 10 tema warna.</div>
       <div id="swatches" class="swatches"></div>
     </div>
-  </div>
+  </details>
 
-  <div class="setting-card collapsible" data-setting-card="user">
-    <div class="setting-collapse-head">
-      <div class="setting-title" data-i18n="userData">Profil Pribadi</div>
-      <button class="setting-toggle" type="button" onclick="toggleSettingCard('user')" aria-label="Minimize">
+  <details class="setting-card setting-drop" data-setting-key="user" open>
+    <summary class="setting-drop-head">
+      <span class="setting-title" data-i18n="userData">Profil Pribadi</span>
+      <span class="setting-drop-arrow">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-    </div>
-    <div class="setting-collapse-body">
+      </span>
+    </summary>
+    <div class="setting-drop-body">
       <button class="setting-row" onclick="openUserModal()">
         <span><span id="userDisplayName">User</span><small id="userDisplayEmail">Belum ada email</small></span><span>›</span>
       </button>
     </div>
-  </div>
+  </details>
 
-  <div class="setting-card collapsible" data-setting-card="language">
-    <div class="setting-collapse-head">
-      <div class="setting-title" data-i18n="language">Bahasa</div>
-      <button class="setting-toggle" type="button" onclick="toggleSettingCard('language')" aria-label="Minimize">
+  <details class="setting-card setting-drop" data-setting-key="language" open>
+    <summary class="setting-drop-head">
+      <span class="setting-title" data-i18n="language">Bahasa</span>
+      <span class="setting-drop-arrow">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-    </div>
-    <div class="setting-collapse-body">
+      </span>
+    </summary>
+    <div class="setting-drop-body">
       <button class="setting-row" onclick="setLanguage('id')"><span>Bahasa Indonesia</span><span id="langIdMark">✓</span></button>
       <button class="setting-row" onclick="setLanguage('en')"><span>English</span><span id="langEnMark"></span></button>
     </div>
-  </div>
+  </details>
 
-  <div class="setting-card collapsible" data-setting-card="categories">
-    <div class="setting-collapse-head">
-      <div class="setting-title" data-i18n="categories">Kategori & Subkategori</div>
-      <button class="setting-toggle" type="button" onclick="toggleSettingCard('categories')" aria-label="Minimize">
+  <details class="setting-card setting-drop" data-setting-key="categories" open>
+    <summary class="setting-drop-head">
+      <span class="setting-title" data-i18n="categories">Kategori & Subkategori</span>
+      <span class="setting-drop-arrow">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-    </div>
-    <div class="setting-collapse-body">
+      </span>
+    </summary>
+    <div class="setting-drop-body">
       <div class="setting-sub" data-i18n="categoriesSub">Tambahkan subkategori agar input transaksi lebih cepat.</div>
       <div id="categoryManager" class="category-box"></div>
       <button class="setting-row" onclick="openSubcategoryModal()"><span data-i18n="addSubcategory">Tambah Subkategori</span><span>+</span></button>
     </div>
-  </div>
+  </details>
 
-  <div class="setting-card collapsible" data-setting-card="data">
-    <div class="setting-collapse-head">
-      <div class="setting-title" data-i18n="data">Data</div>
-      <button class="setting-toggle" type="button" onclick="toggleSettingCard('data')" aria-label="Minimize">
+  <details class="setting-card setting-drop" data-setting-key="data" open>
+    <summary class="setting-drop-head">
+      <span class="setting-title" data-i18n="data">Data</span>
+      <span class="setting-drop-arrow">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-    </div>
-    <div class="setting-collapse-body">
+      </span>
+    </summary>
+    <div class="setting-drop-body">
       <div class="setting-sub" id="storageStatusText">IndexedDB • data lokal di perangkat</div>
       <button class="setting-row" onclick="backupData()"><span><span data-i18n="backup">Backup Data</span><small data-i18n="backupSub">Simpan ke file JSON</small></span><span>›</span></button>
       <label class="setting-row" style="cursor:pointer"><span><span data-i18n="restore">Restore Data</span><small data-i18n="restoreSub">Kembalikan dari backup</small></span><span>›</span><input id="restoreFile" type="file" accept=".json" hidden></label>
       <button class="setting-row" onclick="loadDemo()"><span><span data-i18n="demo">Muat Data Demo</span><small data-i18n="demoSub">Lihat contoh tampilan</small></span><span>›</span></button>
       <button class="setting-row" onclick="resetData()"><span><span data-i18n="reset">Reset Semua Data</span><small data-i18n="resetSub">Hapus data lokal aplikasi</small></span><span>›</span></button>
     </div>
-  </div>
+  </details>
 
 </section>
 
@@ -364,35 +399,37 @@ button{cursor:pointer}
   <button class="nav-btn" data-nav="analytics" onclick="go('analytics')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 19V9M12 19V5M19 19v-7"/></svg></span><span data-i18n="analytics">Analitik</span></button>
   <button class="nav-btn" data-nav="setting" onclick="go('setting')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z"/><path d="M19 12a7 7 0 0 1-.1 1.2l2 1.6-2 3.4-2.4-1a7 7 0 0 1-2 1.2L14.2 21h-4l-.4-2.6a7 7 0 0 1-2-1.2l-2.4 1-2-3.4 2-1.6A7 7 0 0 1 5.3 12c0-.4 0-.8.1-1.2l-2-1.6 2-3.4 2.4 1a7 7 0 0 1 2-1.2L10.2 3h4l.4 2.6a7 7 0 0 1 2 1.2l2.4-1 2 3.4-2 1.6c.1.4.1.8.1 1.2z"/></svg></span><span data-i18n="setting">Setting</span></button>
 </nav>
-  <button class="quick-fab" onclick="openModal('quickAddModal')" aria-label="Tambah transaksi">
+  <button class="quick-fab" onclick="openQuickChooser()" aria-label="Tambah transaksi">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
   </button>
 </div>
 
-<div id="quickAddModal" class="modal-bg" onclick="if(event.target===this)closeModal('quickAddModal')"><div class="modal">
-  <div class="modal-head"><h3>Tambah Transaksi</h3><button class="close" onclick="closeModal('quickAddModal')">×</button></div>
-  <div class="quick-add-sheet">
-    <button class="quick-add-choice" onclick="openQuickTransaction('INCOME',event)">
-      <span class="qa-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M12 5v14"/><path d="m17 14-5 5-5-5"/>
-        </svg>
-      </span>
-      <span>Pemasukan</span>
-    </button>
-    <button class="quick-add-choice" onclick="openQuickTransaction('EXPENSE',event)">
-      <span class="qa-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M12 19V5"/><path d="m7 10 5-5 5 5"/>
-        </svg>
-      </span>
-      <span>Pengeluaran</span>
-    </button>
+<div id="quickAddModal" class="modal-bg" onclick="if(event.target===this)closeQuickTransactionModal()"><div class="modal">
+  <div id="quickChooserView">
+    <div class="modal-head"><h3>Tambah Transaksi</h3><button class="close" onclick="closeQuickTransactionModal()">×</button></div>
+    <div class="quick-add-sheet">
+      <button class="quick-add-choice" onclick="showQuickForm('INCOME',event)">
+        <span class="qa-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 5v14"/><path d="m17 14-5 5-5-5"/>
+          </svg>
+        </span>
+        <span>Pemasukan</span>
+      </button>
+      <button class="quick-add-choice" onclick="showQuickForm('EXPENSE',event)">
+        <span class="qa-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 19V5"/><path d="m7 10 5-5 5 5"/>
+          </svg>
+        </span>
+        <span>Pengeluaran</span>
+      </button>
+    </div>
   </div>
-</div>
 
-<div id="txModal" class="modal-bg" onclick="if(event.target===this)closeModal('txModal')"><div class="modal">
-  <div class="modal-head"><h3 id="txTitle">Tambah Transaksi</h3><button class="close" onclick="closeModal('txModal')">×</button></div>
+  <div id="quickFormView" class="hidden">
+
+  <div class="modal-head"><h3 id="txTitle">Tambah Transaksi</h3><button class="close" type="button" onclick="closeQuickTransactionModal()">×</button></div>
   <input id="txId" type="hidden">
   <input id="txLockedType" type="hidden">
   <label class="field"><span data-i18n="amount">Nominal</span><input id="txAmount" class="input" inputmode="numeric"></label>
@@ -401,8 +438,10 @@ button{cursor:pointer}
   <label id="mainCatWrap" class="field"><span data-i18n="mainCategory">Kategori Utama</span><select id="txMainCat" class="select" onchange="refreshSubcategorySelect()"></select></label>
   <label id="subCatWrap" class="field"><span data-i18n="subcategory">Subkategori</span><select id="txSubCat" class="select"></select></label>
   <label class="field"><span data-i18n="date">Tanggal</span><input id="txDate" class="input" type="date"></label>
-  <label class="field"><span data-i18n="note">Catatan</span><input id="txNote" class="input" placeholder="Opsional"></label>
+  <label class="field"><span data-i18n="note">Catatan</span><input id="txNote" class="input" type="text" placeholder="Opsional" autocomplete="off" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
   <div class="bill-actions"><button id="deleteTxBtn" class="btn danger hidden" onclick="deleteTx()">Hapus</button><button class="btn primary grow" onclick="saveTx()" data-i18n="save">Simpan</button></div>
+
+  </div>
 </div></div>
 
 <div id="txDetailModal" class="modal-bg" onclick="if(event.target===this)closeModal('txDetailModal')"><div class="modal">
@@ -704,12 +743,33 @@ function go(id){
 
 
 
-function openQuickTransaction(type,event){
+
+
+
+function openQuickChooser(){
+  $("quickChooserView").classList.remove("hidden");
+  $("quickFormView").classList.add("hidden");
+  openModal("quickAddModal");
+}
+function closeQuickTransactionModal(){
+  const active=document.activeElement;
+  if(active && typeof active.blur==="function")active.blur();
+
+  const modal=$("quickAddModal");
+  if(modal)modal.classList.remove("show","keyboard-up");
+
+  const chooser=$("quickChooserView");
+  const form=$("quickFormView");
+  if(chooser)chooser.classList.remove("hidden");
+  if(form)form.classList.add("hidden");
+
+  document.body.style.overflow="";
+}
+function showQuickForm(type,event){
   if(event){
     event.preventDefault();
     event.stopPropagation();
   }
-
   const visible=data.wallets.filter(w=>!w.hidden);
   if(!visible.length){
     alert(lang==="en"
@@ -717,18 +777,11 @@ function openQuickTransaction(type,event){
       :"Tidak ada dompet aktif. Tampilkan kembali atau tambah dompet terlebih dahulu.");
     return;
   }
-
-  const quick=$("quickAddModal");
-  const tx=$("txModal");
-
-  // Tutup popup pilihan tanpa mengubah scroll/body lebih dulu.
-  quick.classList.remove("show","keyboard-up");
-
-  // Siapkan form transaksi secara sinkron pada klik yang sama.
-  prepareTxForm(type,null);
-
-  // Langsung tampilkan popup input.
-  tx.classList.add("show");
+  const ok=prepareTxForm(type,null);
+  if(!ok)return;
+  $("quickChooserView").classList.add("hidden");
+  $("quickFormView").classList.remove("hidden");
+  $("quickAddModal").classList.add("show");
   document.body.style.overflow="hidden";
 }
 
@@ -741,26 +794,21 @@ function updateModalKeyboardState(){
   open.classList.toggle("keyboard-up",keyboardLikely||focused);
 }
 document.addEventListener("focusin",e=>{
-  if(e.target.matches("input,select,textarea")){
-    const modal=e.target.closest(".modal-bg");
-    if(modal)modal.classList.add("keyboard-up");
-    setTimeout(()=>{
-      try{e.target.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}
-    },180);
-  }
-});
-document.addEventListener("focusout",()=>{
+  if(!e.target.matches("input,select,textarea"))return;
+  const modal=e.target.closest(".modal-bg");
+  if(!modal)return;
+  modal.classList.add("keyboard-up");
   setTimeout(()=>{
-    document.querySelectorAll(".modal-bg").forEach(m=>m.classList.remove("keyboard-up"));
-    updateModalKeyboardState();
-  },160);
+    if(!modal.classList.contains("show"))return;
+    try{e.target.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}
+  },220);
 });
 if(window.visualViewport){
   window.visualViewport.addEventListener("resize",updateModalKeyboardState);
 }
 
-function openModal(id){$(id).classList.add("show");document.body.style.overflow="hidden"}
-function closeModal(id){$(id).classList.remove("show","keyboard-up");document.body.style.overflow=""}
+function openModal(id){const el=$(id);if(!el)return;el.classList.add("show");document.body.style.overflow="hidden"}
+function closeModal(id){const el=$(id);if(el)el.classList.remove("show","keyboard-up");document.body.style.overflow=""}
 function visibleWalletIds(){return new Set(data.wallets.filter(w=>!w.hidden).map(w=>w.id))}
 function txIsVisible(t){const vis=visibleWalletIds();if(t.type==="TRANSFER")return vis.has(t.walletId)&&vis.has(t.toWalletId);return vis.has(t.walletId)}
 function visibleTx(){return data.tx.filter(txIsVisible)}
@@ -832,7 +880,7 @@ function prepareTxForm(type="EXPENSE",id=null){
    type==="INCOME"?(lang==="en"?"Add Income":"Tambah Pemasukan"):
    (lang==="en"?"Add Transfer":"Tambah Transfer");
 
- $("deleteTxBtn").classList.toggle("hidden",!id);
+ $("deleteTxBtn").classList.toggle("hidden",!id);const qb=$("quickFormBack");if(qb)qb.classList.toggle("hidden",!!id);
  $("toWrap").classList.toggle("hidden",type!=="TRANSFER");
  $("mainCatWrap").classList.toggle("hidden",type==="TRANSFER");
  $("subCatWrap").classList.toggle("hidden",type==="TRANSFER");
@@ -904,7 +952,7 @@ function prepareTxForm(type="EXPENSE",id=null){
 function openTx(type="EXPENSE",locked=true,id=null){
  const ok=prepareTxForm(type,id);
  if(!ok)return;
- openModal("txModal");
+ $("quickChooserView").classList.add("hidden");$("quickFormView").classList.remove("hidden");openModal("quickAddModal");
 }
 async function saveTx(){
  const amount=money($("txAmount").value);
@@ -914,10 +962,14 @@ async function saveTx(){
  const type=String($("txLockedType").value||"EXPENSE").toUpperCase();
 
  if(amount<=0)return alert(lang==="en"?"Enter a valid amount.":"Nominal belum benar.");
- if(!walletId||!data.wallets.some(w=>w.id===walletId))return alert(lang==="en"?"Choose a wallet.":"Pilih dompet terlebih dahulu.");
+ if(!walletId||!data.wallets.some(w=>w.id===walletId))
+   return alert(lang==="en"?"Choose a wallet.":"Pilih dompet terlebih dahulu.");
+
  if(type==="TRANSFER"){
-   if(!toWalletId||!data.wallets.some(w=>w.id===toWalletId))return alert(lang==="en"?"Choose destination wallet.":"Pilih dompet tujuan.");
-   if(walletId===toWalletId)return alert(lang==="en"?"Source and destination wallets must be different.":"Dompet asal dan tujuan harus berbeda.");
+   if(!toWalletId||!data.wallets.some(w=>w.id===toWalletId))
+     return alert(lang==="en"?"Choose destination wallet.":"Pilih dompet tujuan.");
+   if(walletId===toWalletId)
+     return alert(lang==="en"?"Source and destination wallets must be different.":"Dompet asal dan tujuan harus berbeda.");
  }
 
  const mainCategory=type==="TRANSFER"?"Transfer":($("txMainCat").value||"Lainnya");
@@ -943,16 +995,29 @@ async function saveTx(){
    data.tx.push(tx);
  }
 
- // Render dulu agar user langsung melihat hasil input.
- renderAll();
- closeModal("txModal");
+ // Tutup popup segera setelah validasi dan data masuk memory.
+ closeQuickTransactionModal();
 
  try{
-   if(storageMode==="indexeddb"&&db)await idbSet(STATE_KEY,data);
-   else localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data));
-   showToast(type==="EXPENSE"?(lang==="en"?"Expense saved":"Pengeluaran tersimpan"):type==="INCOME"?(lang==="en"?"Income saved":"Pemasukan tersimpan"):(lang==="en"?"Transfer saved":"Transfer tersimpan"));
+   if(storageMode==="indexeddb"&&db){
+     await idbSet(STATE_KEY,data);
+   }else{
+     localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data));
+   }
+
+   // Render setelah popup benar-benar ditutup.
+   try{renderAll()}catch(renderError){console.error("Render error:",renderError)}
+
+   showToast(
+     type==="EXPENSE"?(lang==="en"?"Expense saved":"Pengeluaran tersimpan"):
+     type==="INCOME"?(lang==="en"?"Income saved":"Pemasukan tersimpan"):
+     (lang==="en"?"Transfer saved":"Transfer tersimpan")
+   );
  }catch(e){
-   alert(lang==="en"?"Transaction was added on screen, but saving to storage failed. Please backup your data.":"Transaksi tampil, tapi gagal disimpan ke penyimpanan. Segera lakukan backup data.");
+   console.error(e);
+   alert(lang==="en"
+     ?"Transaction was added but storage failed. Please backup your data."
+     :"Transaksi sudah ditambahkan, tetapi penyimpanan gagal. Segera backup data.");
  }
 }
 function openTxDetail(id){
@@ -968,7 +1033,7 @@ function openTxDetail(id){
  openModal("txDetailModal")
 }
 function editCurrentTx(){const t=data.tx.find(x=>x.id===currentTxDetailId);if(!t)return;closeModal("txDetailModal");openTx(t.type,true,t.id)}
-function deleteTx(){const id=+$("txId").value;if(confirm(lang==="en"?"Delete this transaction?":"Hapus transaksi ini?")){data.tx=data.tx.filter(t=>t.id!==id);closeModal("txModal");save()}}
+function deleteTx(){const id=+$("txId").value;if(confirm(lang==="en"?"Delete this transaction?":"Hapus transaksi ini?")){data.tx=data.tx.filter(t=>t.id!==id);closeQuickTransactionModal();save()}}
 function walletEyeSvg(hidden){
  if(hidden){
    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -1093,11 +1158,58 @@ async function saveSubcategory(){
  closeModal("subcategoryModal");
  showToast(lang==="en"?"Subcategory added":"Subkategori ditambahkan");
 }
+
+
+
+const SETTING_DROP_KEY="dompet_lokal_v12_setting_drop_v3";
+
+function loadSettingDropState(){
+  let state={};
+  try{
+    state=JSON.parse(localStorage.getItem(SETTING_DROP_KEY))||{};
+  }catch(e){}
+  document.querySelectorAll("details.setting-drop[data-setting-key]").forEach(el=>{
+    const key=el.dataset.settingKey;
+    if(Object.prototype.hasOwnProperty.call(state,key)){
+      el.open=state[key]===true;
+    }
+  });
+}
+
+function bindSettingDropState(){
+  document.querySelectorAll("details.setting-drop[data-setting-key]").forEach(el=>{
+    if(el.dataset.bound==="1")return;
+    el.dataset.bound="1";
+    el.addEventListener("toggle",()=>{
+      let state={};
+      try{
+        state=JSON.parse(localStorage.getItem(SETTING_DROP_KEY))||{};
+      }catch(e){}
+      state[el.dataset.settingKey]=el.open;
+      try{
+        localStorage.setItem(SETTING_DROP_KEY,JSON.stringify(state));
+      }catch(e){}
+    });
+  });
+}
+
 function renderSettings(){
- $("userDisplayName").textContent=data.user.name||"User";$("userDisplayEmail").textContent=data.user.email||(lang==="en"?"No email":"Belum ada email");
+ const nameEl=$("userDisplayName");
+ const emailEl=$("userDisplayEmail");
+ if(nameEl)nameEl.textContent=data.user?.name||"User";
+ if(emailEl)emailEl.textContent=data.user?.email||(lang==="en"?"No email":"Belum ada email");
+
  renderCategoryManager();
- const ss=$("storageStatusText");if(ss)ss.textContent=storageMode==="indexeddb"?"IndexedDB • data lokal di perangkat":"localStorage • mode cadangan";
- applySettingCollapseState()
+
+ const ss=$("storageStatusText");
+ if(ss){
+   ss.textContent=storageMode==="indexeddb"
+     ?"IndexedDB • data lokal di perangkat"
+     :"localStorage • mode cadangan";
+ }
+
+ bindSettingDropState();
+ loadSettingDropState();
 }
 function openUserModal(){$("userName").value=data.user.name||"";$("userEmail").value=data.user.email||"";openModal("userModal")}
 function saveUser(){data.user={name:$("userName").value.trim()||"User",email:$("userEmail").value.trim()};closeModal("userModal");save()}
@@ -1108,7 +1220,7 @@ function getNotifications(){
 }
 function updateNotifications(){const n=getNotifications().length;$("notifyDot").textContent=n;$("notifyDot").classList.toggle("hidden",n===0)}
 function openNotifications(){const n=getNotifications();$("notificationsList").innerHTML=n.length?n.map(x=>`<div class="notify-item"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join(""):`<div class="empty">${lang==="en"?"No notifications.":"Tidak ada notifikasi."}</div>`;openModal("notificationsModal")}
-function backupData(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({app:"Dompet Lokal",version:"12.4",data},null,2)],{type:"application/json"}));a.href=url;a.download=`dompet-lokal-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
+function backupData(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({app:"Dompet Lokal",version:"12.8",data},null,2)],{type:"application/json"}));a.href=url;a.download=`dompet-lokal-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
 $("restoreFile").onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const p=JSON.parse(await f.text()),d=normalize(p.data||p);if(!d.wallets||!d.tx||!d.bills)throw 0;if(confirm(lang==="en"?"Replace current data?":"Ganti semua data saat ini?")){data=d;await save()}}catch(_){alert(lang==="en"?"Invalid backup file.":"File backup tidak valid.")}e.target.value=""}
 function resetData(){if(confirm(lang==="en"?"Delete all data?":"Hapus semua data?")&&confirm(lang==="en"?"Are you sure?":"Yakin?")){data=defaultData();save()}}
 function loadDemo(){
