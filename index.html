@@ -241,6 +241,28 @@ button{cursor:pointer}
   display:none !important;
 }
 
+
+/* ===== Subcategory Modal Stable ===== */
+.subcategory-modal-bg{
+  align-items:center !important;
+  justify-content:center !important;
+  padding:18px 12px !important;
+}
+.subcategory-modal-bg.keyboard-up{
+  align-items:flex-start !important;
+  padding-top:28px !important;
+}
+.subcategory-modal{
+  max-height:calc(100dvh - 42px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+.subcategory-modal input,
+.subcategory-modal select,
+.subcategory-modal button{
+  touch-action:manipulation;
+}
+
 </style>
 </head>
 <body>
@@ -404,7 +426,7 @@ button{cursor:pointer}
   </button>
 </div>
 
-<div id="quickAddModal" class="modal-bg" onclick="if(event.target===this)closeQuickTransactionModal()"><div class="modal">
+<div id="quickAddModal" class="modal-bg" onclick="if(event.target===this)closeQuickTransactionModal()"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div id="quickChooserView">
     <div class="modal-head"><h3>Tambah Transaksi</h3><button class="close" onclick="closeQuickTransactionModal()">×</button></div>
     <div class="quick-add-sheet">
@@ -444,7 +466,7 @@ button{cursor:pointer}
   </div>
 </div></div>
 
-<div id="txDetailModal" class="modal-bg" onclick="if(event.target===this)closeModal('txDetailModal')"><div class="modal">
+<div id="txDetailModal" class="modal-bg" onclick="if(event.target===this)closeModal('txDetailModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head">
     <h3 id="txDetailTitle">Detail Transaksi</h3>
     <div class="modal-head-actions">
@@ -455,54 +477,81 @@ button{cursor:pointer}
   <div id="txDetailContent"></div>
 </div></div>
 
-<div id="walletModal" class="modal-bg" onclick="if(event.target===this)closeModal('walletModal')"><div class="modal">
+<div id="walletModal" class="modal-bg" onclick="if(event.target===this)closeModal('walletModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 id="walletTitle">Tambah Dompet</h3><button class="close" onclick="closeModal('walletModal')">×</button></div>
   <input id="walletId" type="hidden">
-  <label class="field"><span data-i18n="walletName">Nama Dompet</span><input id="walletName" class="input"></label>
-  <label class="field"><span data-i18n="openingBalance">Saldo Awal</span><input id="walletOpening" class="input" inputmode="numeric"></label>
+  <label class="field"><span data-i18n="walletName">Nama Dompet</span><input id="walletName" class="input" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+  <label class="field"><span data-i18n="openingBalance">Saldo Awal</span><input id="walletOpening" class="input" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
   <label class="field"><span data-i18n="walletVisibility">Visibilitas Dompet</span><select id="walletHidden" class="select"><option value="0">Tampilkan</option><option value="1">Hide dari saldo & analitik</option></select></label>
   <div class="bill-actions"><button id="deleteWalletBtn" class="btn danger hidden" onclick="deleteWallet()">Hapus</button><button class="btn primary grow" onclick="saveWallet()" data-i18n="save">Simpan</button></div>
 </div></div>
 
-<div id="billModal" class="modal-bg" onclick="if(event.target===this)closeModal('billModal')"><div class="modal">
+<div id="billModal" class="modal-bg" onclick="if(event.target===this)closeModal('billModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 id="billTitle">Tambah Tagihan</h3><button class="close" onclick="closeModal('billModal')">×</button></div>
   <input id="billId" type="hidden">
-  <label class="field"><span data-i18n="billName">Nama Tagihan</span><input id="billName" class="input"></label>
-  <label class="field"><span data-i18n="defaultAmount">Nominal Default</span><input id="billAmount" class="input" inputmode="numeric"></label>
-  <label class="field"><span data-i18n="dueDay">Tanggal Jatuh Tempo</span><input id="billDay" class="input" type="number" min="1" max="31" value="1"></label>
+  <label class="field"><span data-i18n="billName">Nama Tagihan</span><input id="billName" class="input" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+  <label class="field"><span data-i18n="defaultAmount">Nominal Default</span><input id="billAmount" class="input" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+  <label class="field"><span data-i18n="dueDay">Tanggal Jatuh Tempo</span><input id="billDay" class="input" type="number" min="1" max="31" value="1" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
   <label class="field"><span data-i18n="wallet">Dompet</span><select id="billWallet" class="select"></select></label>
   <label class="field"><span data-i18n="mainCategory">Kategori Utama</span><select id="billMainCat" class="select" onchange="refreshBillSubcategorySelect()"></select></label>
   <label class="field"><span data-i18n="subcategory">Subkategori</span><select id="billSubCat" class="select"></select></label>
-  <label class="field"><span data-i18n="note">Catatan</span><input id="billNote" class="input"></label>
+  <label class="field"><span data-i18n="note">Catatan</span><input id="billNote" class="input" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
   <div class="bill-actions"><button id="deleteBillBtn" class="btn danger hidden" onclick="deleteBill()">Hapus</button><button class="btn primary grow" onclick="saveBill()" data-i18n="save">Simpan</button></div>
 </div></div>
 
-<div id="billHistoryModal" class="modal-bg" onclick="if(event.target===this)closeModal('billHistoryModal')"><div class="modal">
+<div id="billHistoryModal" class="modal-bg" onclick="if(event.target===this)closeModal('billHistoryModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 data-i18n="paymentHistory">Riwayat Pembayaran</h3><button class="close" onclick="closeModal('billHistoryModal')">×</button></div>
   <div id="billHistoryContent"></div>
 </div></div>
 
-<div id="notificationsModal" class="modal-bg" onclick="if(event.target===this)closeModal('notificationsModal')"><div class="modal">
+<div id="notificationsModal" class="modal-bg" onclick="if(event.target===this)closeModal('notificationsModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 data-i18n="notifications">Notifikasi</h3><button class="close" onclick="closeModal('notificationsModal')">×</button></div>
   <div id="notificationsList"></div>
 </div></div>
 
-<div id="userModal" class="modal-bg" onclick="if(event.target===this)closeModal('userModal')"><div class="modal">
+<div id="userModal" class="modal-bg" onclick="if(event.target===this)closeModal('userModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 data-i18n="userData">Profil Pribadi</h3><button class="close" onclick="closeModal('userModal')">×</button></div>
-  <label class="field"><span data-i18n="name">Nama</span><input id="userName" class="input"></label>
-  <label class="field"><span>Email</span><input id="userEmail" class="input" type="email"></label>
+  <label class="field"><span data-i18n="name">Nama</span><input id="userName" class="input" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+  <label class="field"><span>Email</span><input id="userEmail" class="input" type="email" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
   <button class="btn primary" style="width:100%" onclick="saveUser()" data-i18n="save">Simpan</button>
 </div></div>
 
-<div id="subcategoryModal" class="modal-bg" onclick="if(event.target===this)closeModal('subcategoryModal')"><div class="modal">
-  <div class="modal-head"><h3 data-i18n="addSubcategory">Tambah Subkategori</h3><button class="close" onclick="closeModal('subcategoryModal')">×</button></div>
-  <label class="field"><span data-i18n="type">Jenis</span><select id="subType" class="select" onchange="refreshMainCategoryManager()"><option value="EXPENSE">Pengeluaran</option><option value="INCOME">Pemasukan</option></select></label>
-  <label class="field"><span data-i18n="mainCategory">Kategori Utama</span><select id="subMainCat" class="select"></select></label>
-  <label class="field"><span data-i18n="subcategory">Subkategori</span><input id="subName" class="input"></label>
-  <button class="btn primary" style="width:100%" onclick="saveSubcategory()" data-i18n="save">Simpan</button>
-</div></div>
+<div id="subcategoryModal" class="modal-bg subcategory-modal-bg">
+  <div class="modal subcategory-modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 data-i18n="addSubcategory">Tambah Subkategori</h3>
+      <button class="close" type="button" onclick="closeSubcategoryModal()">×</button>
+    </div>
 
-<div id="moreModal" class="modal-bg" onclick="if(event.target===this)closeModal('moreModal')"><div class="modal">
+    <label class="field">
+      <span data-i18n="type">Jenis</span>
+      <select id="subType" class="select" onchange="refreshMainCategoryManager()">
+        <option value="EXPENSE">Pengeluaran</option>
+        <option value="INCOME">Pemasukan</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span data-i18n="mainCategory">Kategori Utama</span>
+      <select id="subMainCat" class="select"></select>
+    </label>
+
+    <label class="field">
+      <span data-i18n="subcategory">Subkategori</span>
+      <input
+        id="subName"
+        class="input"
+        type="text"
+        autocomplete="off"
+        enterkeyhint="done"
+        placeholder="Contoh: Makan Siang">
+    </label>
+
+    <button class="btn primary" type="button" style="width:100%" onclick="saveSubcategory()" data-i18n="save">Simpan</button>
+  </div>
+</div>
+
+<div id="moreModal" class="modal-bg" onclick="if(event.target===this)closeModal('moreModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 data-i18n="more">Lainnya</h3><button class="close" onclick="closeModal('moreModal')">×</button></div>
   <div class="action-sheet">
     <button onclick="closeModal('moreModal');openBill()" data-i18n="addBill">Tambah Tagihan</button>
@@ -512,7 +561,7 @@ button{cursor:pointer}
   </div>
 </div></div>
 
-<div id="allTxModal" class="modal-bg" onclick="if(event.target===this)closeModal('allTxModal')"><div class="modal">
+<div id="allTxModal" class="modal-bg" onclick="if(event.target===this)closeModal('allTxModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 data-i18n="allTransactions">Semua Transaksi</h3><button class="close" onclick="closeModal('allTxModal')">×</button></div>
   <div id="allTxList" class="tx-list"></div>
 </div></div>
@@ -786,29 +835,71 @@ function showQuickForm(type,event){
 }
 
 function updateModalKeyboardState(){
-  const open=document.querySelector(".modal-bg.show");
-  if(!open)return;
+  const active=document.activeElement;
+  const modal=active?.closest?.(".modal-bg.show");
+  if(!modal)return;
+
   const vv=window.visualViewport;
   const keyboardLikely=vv ? (window.innerHeight-vv.height>140) : false;
-  const focused=document.activeElement && ["INPUT","SELECT","TEXTAREA"].includes(document.activeElement.tagName);
-  open.classList.toggle("keyboard-up",keyboardLikely||focused);
+  const focused=active && ["INPUT","SELECT","TEXTAREA"].includes(active.tagName);
+  modal.classList.toggle("keyboard-up",keyboardLikely||focused);
 }
 document.addEventListener("focusin",e=>{
   if(!e.target.matches("input,select,textarea"))return;
   const modal=e.target.closest(".modal-bg");
-  if(!modal)return;
+  if(!modal || !modal.classList.contains("show"))return;
+
   modal.classList.add("keyboard-up");
+
   setTimeout(()=>{
     if(!modal.classList.contains("show"))return;
-    try{e.target.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}
+    try{
+      e.target.scrollIntoView({block:"center",inline:"nearest",behavior:"smooth"});
+    }catch(_){}
   },220);
 });
+document.addEventListener("focusout",e=>{
+  const modal=e.target.closest?.(".modal-bg");
+  if(!modal)return;
+  setTimeout(()=>{
+    const active=document.activeElement;
+    if((!active || !modal.contains(active)) && modal.id!=="subcategoryModal"){
+      modal.classList.remove("keyboard-up");
+    }
+  },180);
+});
+
+document.addEventListener("focusin",e=>{
+  if(e.target && e.target.id==="subName"){
+    const modal=$("subcategoryModal");
+    if(modal && modal.classList.contains("show")){
+      modal.classList.add("keyboard-up");
+      setTimeout(()=>{
+        try{e.target.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}
+      },180);
+    }
+  }
+});
+
 if(window.visualViewport){
   window.visualViewport.addEventListener("resize",updateModalKeyboardState);
 }
-
-function openModal(id){const el=$(id);if(!el)return;el.classList.add("show");document.body.style.overflow="hidden"}
-function closeModal(id){const el=$(id);if(el)el.classList.remove("show","keyboard-up");document.body.style.overflow=""}
+function openModal(id){
+  const el=$(id);
+  if(!el)return;
+  el.classList.remove("keyboard-up");
+  el.classList.add("show");
+  document.body.style.overflow="hidden";
+}
+function closeModal(id){
+  const el=$(id);
+  if(!el)return;
+  if(el.contains(document.activeElement) && typeof document.activeElement.blur==="function"){
+    document.activeElement.blur();
+  }
+  el.classList.remove("show","keyboard-up");
+  document.body.style.overflow="";
+}
 function visibleWalletIds(){return new Set(data.wallets.filter(w=>!w.hidden).map(w=>w.id))}
 function txIsVisible(t){const vis=visibleWalletIds();if(t.type==="TRANSFER")return vis.has(t.walletId)&&vis.has(t.toWalletId);return vis.has(t.walletId)}
 function visibleTx(){return data.tx.filter(txIsVisible)}
@@ -1088,10 +1179,39 @@ function billStatus(b){
  const d=new Date().getDate(),day=+b.day;if(d===day)return lang==="en"?"Today":"Hari ini";if(d+1===day)return lang==="en"?"Tomorrow":"Besok";if(d<day)return `${day-d} ${lang==="en"?"days":"hari"}`;return lang==="en"?"Unpaid":"Belum bayar"
 }
 function openBill(id=null){
- populateWallets();$("billId").value="";$("billTitle").textContent=id?(lang==="en"?"Edit Bill":"Edit Tagihan"):(lang==="en"?"Add Bill":"Tambah Tagihan");$("billName").value="";$("billAmount").value="";$("billDay").value=1;$("billNote").value="";$("deleteBillBtn").classList.toggle("hidden",!id);
- if(id){const b=data.bills.find(x=>String(x.id)===String(id));$("billId").value=b.id;$("billName").value=b.name;$("billAmount").value=b.amount.toLocaleString("id-ID");$("billDay").value=b.day;$("billWallet").value=b.walletId;$("billNote").value=b.note||"";fillCategorySelects("EXPENSE","billMainCat","billSubCat",b.mainCategory||b.category,b.subcategory||"")}
- else fillCategorySelects("EXPENSE","billMainCat","billSubCat");
- openModal("billModal")
+ populateWallets();
+ $("billId").value="";
+ $("billTitle").textContent=id?(lang==="en"?"Edit Bill":"Edit Tagihan"):(lang==="en"?"Add Bill":"Tambah Tagihan");
+ $("billName").value="";
+ $("billAmount").value="";
+ $("billDay").value=1;
+ $("billNote").value="";
+ $("deleteBillBtn").classList.toggle("hidden",!id);
+
+ if(id){
+   const b=data.bills.find(x=>String(x.id)===String(id));
+   if(!b)return;
+
+   const currentWallet=data.wallets.find(w=>w.id===Number(b.walletId));
+   if(currentWallet?.hidden && !$("billWallet").querySelector(`option[value="${currentWallet.id}"]`)){
+     const opt=document.createElement("option");
+     opt.value=String(currentWallet.id);
+     opt.textContent=currentWallet.name+" (Hidden)";
+     $("billWallet").appendChild(opt);
+   }
+
+   $("billId").value=b.id;
+   $("billName").value=b.name;
+   $("billAmount").value=Number(b.amount).toLocaleString("id-ID");
+   $("billDay").value=b.day;
+   $("billWallet").value=String(b.walletId);
+   $("billNote").value=b.note||"";
+   fillCategorySelects("EXPENSE","billMainCat","billSubCat",b.mainCategory||b.category,b.subcategory||"");
+ }else{
+   fillCategorySelects("EXPENSE","billMainCat","billSubCat");
+ }
+
+ openModal("billModal");
 }
 function saveBill(){
  const id=$("billId").value,name=$("billName").value.trim(),amount=money($("billAmount").value),day=Math.max(1,Math.min(31,+$("billDay").value||1));
@@ -1118,11 +1238,29 @@ function openBillHistory(id){
  openModal("billHistoryModal")
 }
 function renderBills(){
- const list=[...data.bills].sort((a,b)=>(billPaidThisMonth(a)-billPaidThisMonth(b))||a.day-b.day);
+ const visibleWalletSet=new Set(data.wallets.filter(w=>!w.hidden).map(w=>Number(w.id)));
+ const list=data.bills
+   .filter(b=>visibleWalletSet.has(Number(b.walletId)))
+   .sort((a,b)=>(billPaidThisMonth(a)-billPaidThisMonth(b))||a.day-b.day);
+
  $("billList").innerHTML=list.length?list.map(b=>{
  const p=billMonthPayment(b);
- return `<div class="bill-card"><div class="bill-top"><div><div class="bill-name">${esc(b.name)}</div><div class="bill-meta">${lang==="en"?"Due":"Jatuh tempo"} ${b.day}${p?` · ${lang==="en"?"paid":"dibayar"} ${formatDate(p.paidDate)}`:""}</div></div><span class="badge ${p?"paid":""}">${billStatus(b)}</span></div><div class="bill-amount">${rp(p?.amount||b.amount)}</div><div class="bill-actions"><button class="btn primary grow" onclick="payBill('${b.id}')">${p?(lang==="en"?"Pay Again":"Bayar Lagi"):(lang==="en"?"Pay":"Bayar")}</button><button class="btn soft" onclick="openBillHistory('${b.id}')">${lang==="en"?"History":"Riwayat"}</button><button class="btn soft" onclick="openBill('${b.id}')">${lang==="en"?"Edit":"Edit"}</button></div></div>`
- }).join(""):`<div class="empty">${lang==="en"?"No bills yet.":"Belum ada tagihan."}</div>`
+ return `<div class="bill-card">
+   <div class="bill-top">
+     <div>
+       <div class="bill-name">${esc(b.name)}</div>
+       <div class="bill-meta">${lang==="en"?"Due":"Jatuh tempo"} ${b.day}${p?` · ${lang==="en"?"paid":"dibayar"} ${formatDate(p.paidDate)}`:""}</div>
+     </div>
+     <span class="badge ${p?"paid":""}">${billStatus(b)}</span>
+   </div>
+   <div class="bill-amount">${rp(p?.amount||b.amount)}</div>
+   <div class="bill-actions">
+     <button class="btn primary grow" onclick="payBill('${b.id}')">${p?(lang==="en"?"Pay Again":"Bayar Lagi"):(lang==="en"?"Pay":"Bayar")}</button>
+     <button class="btn soft" onclick="openBillHistory('${b.id}')">${lang==="en"?"History":"Riwayat"}</button>
+     <button class="btn soft" onclick="openBill('${b.id}')">${lang==="en"?"Edit":"Edit"}</button>
+   </div>
+ </div>`;
+ }).join(""):`<div class="empty">${lang==="en"?"No active bills.":"Belum ada tagihan aktif."}</div>`;
 }
 function renderAnalytics(){
  const m=monthTx(),income=m.filter(t=>t.type==="INCOME").reduce((s,t)=>s+t.amount,0),expense=m.filter(t=>t.type==="EXPENSE").reduce((s,t)=>s+t.amount,0);
@@ -1136,29 +1274,81 @@ function renderCategoryManager(){
  ["EXPENSE","INCOME"].forEach(type=>{Object.entries(data.categories[type]||{}).forEach(([main,subs])=>out.push(`<div class="category-group"><b>${type==="EXPENSE"?(lang==="en"?"Expense":"Pengeluaran"):(lang==="en"?"Income":"Pemasukan")} · ${esc(main)}</b><div class="subcategory-list">${subs.map(esc).join(" · ")||"-"}</div></div>`))});
  $("categoryManager").innerHTML=out.join("")
 }
-function openSubcategoryModal(){$("subType").value="EXPENSE";$("subName").value="";refreshMainCategoryManager();openModal("subcategoryModal")}
-function refreshMainCategoryManager(){
- const type=$("subType").value;
- const cats=data.categories[type]||{};
- const names=Object.keys(cats);
- $("subMainCat").innerHTML=names.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
-}
-async function saveSubcategory(){
- const type=$("subType").value;
- const main=$("subMainCat").value;
- const name=$("subName").value.trim();
- if(!main)return alert(lang==="en"?"Choose a main category.":"Pilih kategori utama.");
- if(!name)return alert(lang==="en"?"Enter a subcategory name.":"Isi nama subkategori.");
- if(!data.categories[type])data.categories[type]={};
- if(!Array.isArray(data.categories[type][main]))data.categories[type][main]=[];
- const exists=data.categories[type][main].some(x=>String(x).toLowerCase()===name.toLowerCase());
- if(exists)return alert(lang==="en"?"Subcategory already exists.":"Subkategori sudah ada.");
- data.categories[type][main].push(name);
- await save();
- closeModal("subcategoryModal");
- showToast(lang==="en"?"Subcategory added":"Subkategori ditambahkan");
+function openSubcategoryModal(){
+  const modal=$("subcategoryModal");
+  $("subType").value="EXPENSE";
+  $("subName").value="";
+  refreshMainCategoryManager();
+
+  modal.classList.remove("keyboard-up");
+  modal.classList.add("show");
+  document.body.style.overflow="hidden";
 }
 
+function closeSubcategoryModal(){
+  const modal=$("subcategoryModal");
+  const active=document.activeElement;
+  if(active && modal.contains(active) && typeof active.blur==="function"){
+    active.blur();
+  }
+  modal.classList.remove("show","keyboard-up");
+  document.body.style.overflow="";
+}
+
+function refreshMainCategoryManager(){
+  const type=$("subType").value;
+  const cats=data.categories[type]||{};
+  const names=Object.keys(cats);
+  $("subMainCat").innerHTML=names
+    .map(c=>`<option value="${esc(c)}">${esc(c)}</option>`)
+    .join("");
+}
+
+async function saveSubcategory(){
+  const type=$("subType").value;
+  const main=$("subMainCat").value;
+  const name=$("subName").value.trim();
+
+  if(!main){
+    alert(lang==="en"?"Choose a main category.":"Pilih kategori utama.");
+    return;
+  }
+  if(!name){
+    alert(lang==="en"?"Enter a subcategory name.":"Isi nama subkategori.");
+    $("subName").focus();
+    return;
+  }
+
+  if(!data.categories[type])data.categories[type]={};
+  if(!Array.isArray(data.categories[type][main]))data.categories[type][main]=[];
+
+  const exists=data.categories[type][main].some(
+    item=>String(item).trim().toLowerCase()===name.toLowerCase()
+  );
+  if(exists){
+    alert(lang==="en"?"Subcategory already exists.":"Subkategori sudah ada.");
+    return;
+  }
+
+  data.categories[type][main].push(name);
+
+  try{
+    if(storageMode==="indexeddb"&&db){
+      await idbSet(STATE_KEY,data);
+    }else{
+      localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data));
+    }
+
+    closeSubcategoryModal();
+    renderCategoryManager();
+    showToast(lang==="en"?"Subcategory added":"Subkategori ditambahkan");
+  }catch(e){
+    console.error("saveSubcategory:",e);
+    alert(lang==="en"
+      ?"Failed to save subcategory."
+      :"Gagal menyimpan subkategori.");
+  }
+}
 
 
 const SETTING_DROP_KEY="dompet_lokal_v12_setting_drop_v3";
@@ -1220,7 +1410,7 @@ function getNotifications(){
 }
 function updateNotifications(){const n=getNotifications().length;$("notifyDot").textContent=n;$("notifyDot").classList.toggle("hidden",n===0)}
 function openNotifications(){const n=getNotifications();$("notificationsList").innerHTML=n.length?n.map(x=>`<div class="notify-item"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join(""):`<div class="empty">${lang==="en"?"No notifications.":"Tidak ada notifikasi."}</div>`;openModal("notificationsModal")}
-function backupData(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({app:"Dompet Lokal",version:"12.8",data},null,2)],{type:"application/json"}));a.href=url;a.download=`dompet-lokal-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
+function backupData(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({app:"Dompet Lokal",version:"13.0",data},null,2)],{type:"application/json"}));a.href=url;a.download=`dompet-lokal-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
 $("restoreFile").onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const p=JSON.parse(await f.text()),d=normalize(p.data||p);if(!d.wallets||!d.tx||!d.bills)throw 0;if(confirm(lang==="en"?"Replace current data?":"Ganti semua data saat ini?")){data=d;await save()}}catch(_){alert(lang==="en"?"Invalid backup file.":"File backup tidak valid.")}e.target.value=""}
 function resetData(){if(confirm(lang==="en"?"Delete all data?":"Hapus semua data?")&&confirm(lang==="en"?"Are you sure?":"Yakin?")){data=defaultData();save()}}
 function loadDemo(){
@@ -1236,6 +1426,22 @@ function applyTheme(t,index=null){document.documentElement.style.setProperty("--
 function renderSwatches(active=null){$("swatches").innerHTML=themes.map((t,i)=>`<button class="swatch ${active===i?"active":""}" title="${t.name}" onclick='applyTheme(${JSON.stringify(t)},${i})' style="background:linear-gradient(135deg,${t.bg} 50%,${t.surface} 50%)"></button>`).join("")}
 function loadTheme(){let t=themes[0];try{const x=JSON.parse(localStorage.getItem(THEME_KEY));if(x?.bg&&x?.surface&&x?.accent)t=x}catch(e){}const idx=themes.findIndex(x=>x.bg.toLowerCase()===t.bg.toLowerCase()&&x.surface.toLowerCase()===t.surface.toLowerCase()&&x.accent.toLowerCase()===t.accent.toLowerCase());applyTheme(t,idx>=0?idx:null)}
 function renderAll(){populateWallets();renderHome();renderWallet();renderAnalytics();renderSettings();updateNotifications()}
+
+function runDompetLokalDiagnostics(){
+ const issues=[];
+ const requiredIds=[
+  "homeBalance","walletGrid","billList","categoryReport","swatches",
+  "subcategoryModal","subType","subMainCat","subName","quickAddModal",
+  "quickChooserView","quickFormView","txAmount","txWallet","txNote"
+ ];
+ requiredIds.forEach(id=>{if(!$(id))issues.push("Missing #"+id)});
+ if(!Array.isArray(data.wallets))issues.push("wallets invalid");
+ if(!Array.isArray(data.tx))issues.push("tx invalid");
+ if(!Array.isArray(data.bills))issues.push("bills invalid");
+ if(!data.categories?.EXPENSE||!data.categories?.INCOME)issues.push("categories invalid");
+ return {ok:issues.length===0,issues};
+}
+
 async function startApp(){
  await initStorage();
  loadTheme();
