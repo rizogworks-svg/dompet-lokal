@@ -1,13 +1,12 @@
 {
   "name": "Dompet Lokal",
   "short_name": "Dompet Lokal",
-  "description": "Pencatat pemasukan, pengeluaran, dompet, dan laporan yang tersimpan lokal di perangkat.",
-  "lang": "id-ID",
+  "description": "Aplikasi pencatat keuangan pribadi yang menyimpan data lokal di perangkat.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f4f4f4",
-  "theme_color": "#8fa88a",
+  "background_color": "#ecefe8",
+  "theme_color": "#71866d",
   "icons": [
     {
       "src": "./icon-192.png",
