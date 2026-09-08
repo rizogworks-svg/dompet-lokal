@@ -106,7 +106,7 @@ button{cursor:pointer}
 .nav-btn{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px 2px;color:#8b9094;font-size:7.5px;font-weight:700}
 .nav-btn.active{color:var(--ink)}.nav-icon{width:31px;height:31px;border-radius:10px;display:grid;place-items:center}.nav-btn.active .nav-icon{background:var(--accent);color:#fff}
 .nav-icon svg{width:19px;height:19px;stroke-width:1.8}
-.modal-bg{position:fixed;inset:0;background:rgba(12,14,16,.34);display:none;align-items:flex-start;justify-content:center;padding:72px 12px 18px;z-index:100;overflow:auto}
+.modal-bg{position:fixed;inset:0;background:rgba(12,14,16,.34);display:none;align-items:center;justify-content:center;padding:18px 12px;z-index:100;overflow:auto}
 .modal-bg.show{display:flex}
 .modal{width:min(470px,100%);max-height:calc(100dvh - 96px);overflow:auto;background:var(--surface);border-radius:24px;padding:16px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}.modal-head h3{margin:0;font-size:13px}
@@ -150,6 +150,63 @@ button{cursor:pointer}
 .wallet-eye svg{width:16px;height:16px;stroke-width:1.8}
 .wallet-card.hidden-wallet .wallet-eye{background:var(--surface)}
 
+
+/* ===== Quick Add FAB ===== */
+.quick-fab{
+  position:fixed;
+  right:max(18px,calc((100vw - 470px)/2 + 18px));
+  bottom:92px;
+  width:56px;height:56px;border-radius:50%;
+  border:0;background:var(--accent);color:#fff;
+  display:grid;place-items:center;z-index:60;
+  box-shadow:0 14px 30px rgba(0,0,0,.18);
+}
+.quick-fab svg{width:24px;height:24px;stroke-width:2}
+.quick-add-sheet{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.quick-add-choice{
+  border:1px solid var(--line);background:var(--surface-soft);
+  border-radius:18px;padding:16px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  font-size:9.5px;font-weight:800;
+}
+.quick-add-choice .qa-icon{
+  width:48px;height:48px;border-radius:50%;
+  background:var(--surface);display:grid;place-items:center;
+  border:1px solid var(--line);
+}
+.quick-add-choice svg{width:21px;height:21px;stroke-width:1.9}
+
+
+/* ===== Save Feedback ===== */
+.toast{
+  position:fixed;left:50%;bottom:158px;transform:translateX(-50%) translateY(12px);
+  background:var(--accent);color:#fff;padding:10px 14px;border-radius:999px;
+  font-size:9px;font-weight:750;opacity:0;pointer-events:none;z-index:250;
+  transition:.2s ease;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+
+/* ===== Modal keyboard behavior ===== */
+.modal-bg.keyboard-up{
+  align-items:flex-start;
+  padding-top:38px;
+}
+@media (max-height:650px){
+  .modal-bg.keyboard-up{padding-top:18px}
+}
+
+
+.quick-add-choice{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.quick-add-choice:active{
+  transform:scale(.98);
+}
+
 </style>
 </head>
 <body>
@@ -181,11 +238,11 @@ button{cursor:pointer}
 
   <div class="quick-card">
     <button class="quick-btn" onclick="openTx('EXPENSE',true)">
-      <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14"/><path d="m17 14-5 5-5-5"/></svg></div>
+      <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19V5"/><path d="m7 10 5-5 5 5"/></svg></div>
       <div class="quick-label" data-i18n="expense">Pengeluaran</div>
     </button>
     <button class="quick-btn" onclick="openTx('INCOME',true)">
-      <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19V5"/><path d="m7 10 5-5 5 5"/></svg></div>
+      <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14"/><path d="m17 14-5 5-5-5"/></svg></div>
       <div class="quick-label" data-i18n="income">Pemasukan</div>
     </button>
     <button class="quick-btn" onclick="openTx('TRANSFER',true)">
@@ -307,6 +364,31 @@ button{cursor:pointer}
   <button class="nav-btn" data-nav="analytics" onclick="go('analytics')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 19V9M12 19V5M19 19v-7"/></svg></span><span data-i18n="analytics">Analitik</span></button>
   <button class="nav-btn" data-nav="setting" onclick="go('setting')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z"/><path d="M19 12a7 7 0 0 1-.1 1.2l2 1.6-2 3.4-2.4-1a7 7 0 0 1-2 1.2L14.2 21h-4l-.4-2.6a7 7 0 0 1-2-1.2l-2.4 1-2-3.4 2-1.6A7 7 0 0 1 5.3 12c0-.4 0-.8.1-1.2l-2-1.6 2-3.4 2.4 1a7 7 0 0 1 2-1.2L10.2 3h4l.4 2.6a7 7 0 0 1 2 1.2l2.4-1 2 3.4-2 1.6c.1.4.1.8.1 1.2z"/></svg></span><span data-i18n="setting">Setting</span></button>
 </nav>
+  <button class="quick-fab" onclick="openModal('quickAddModal')" aria-label="Tambah transaksi">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+</div>
+
+<div id="quickAddModal" class="modal-bg" onclick="if(event.target===this)closeModal('quickAddModal')"><div class="modal">
+  <div class="modal-head"><h3>Tambah Transaksi</h3><button class="close" onclick="closeModal('quickAddModal')">×</button></div>
+  <div class="quick-add-sheet">
+    <button class="quick-add-choice" onclick="openQuickTransaction('INCOME',event)">
+      <span class="qa-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 5v14"/><path d="m17 14-5 5-5-5"/>
+        </svg>
+      </span>
+      <span>Pemasukan</span>
+    </button>
+    <button class="quick-add-choice" onclick="openQuickTransaction('EXPENSE',event)">
+      <span class="qa-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 19V5"/><path d="m7 10 5-5 5 5"/>
+        </svg>
+      </span>
+      <span>Pengeluaran</span>
+    </button>
+  </div>
 </div>
 
 <div id="txModal" class="modal-bg" onclick="if(event.target===this)closeModal('txModal')"><div class="modal">
@@ -455,15 +537,14 @@ function normalize(d){
  if(!Array.isArray(d.tx))d.tx=[];
  if(!Array.isArray(d.bills))d.bills=[];
 
- // Migrasi kategori lama Dompet Lokal: array -> kategori utama + subkategori.
  if(!d.categories)d.categories=defaultCategories();
  ["EXPENSE","INCOME"].forEach(type=>{
    const current=d.categories[type];
    if(Array.isArray(current)){
-     const defaults=defaultCategories()[type];
-     const converted={};
+     const defaults=defaultCategories()[type], converted={};
      current.forEach(name=>{
-       converted[name]=Array.isArray(defaults[name])?[...defaults[name]]:["Umum"];
+       const key=String(name||"Lainnya");
+       converted[key]=Array.isArray(defaults[key])?[...defaults[key]]:["Umum"];
      });
      d.categories[type]=converted;
    }else if(!current||typeof current!=="object"){
@@ -472,41 +553,48 @@ function normalize(d){
  });
  if(!d.user)d.user={name:"User",email:""};
 
- d.wallets.forEach(w=>{if(typeof w.hidden!=="boolean")w.hidden=false});
-
- d.tx.forEach(t=>{
+ // Pastikan ID konsisten sebagai angka.
+ d.wallets.forEach((w,i)=>{
+   w.id=Number(w.id)||i+1;
+   w.opening=Number(w.opening)||0;
+   if(typeof w.hidden!=="boolean")w.hidden=false;
+ });
+ d.tx.forEach((t,i)=>{
+   t.id=Number(t.id)||i+1;
+   t.walletId=Number(t.walletId)||0;
+   if(t.toWalletId!==undefined&&t.toWalletId!==null&&t.toWalletId!=="")t.toWalletId=Number(t.toWalletId)||0;
+   t.amount=Number(t.amount)||0;
+   t.type=String(t.type||"EXPENSE").toUpperCase();
    if(!t.mainCategory&&t.category)t.mainCategory=t.category;
    if(!t.mainCategory)t.mainCategory=t.type==="TRANSFER"?"Transfer":"Lainnya";
+   if(!t.category)t.category=t.mainCategory;
    if(!t.subcategory)t.subcategory="";
+   if(!t.date)t.date=today();
  });
-
  d.bills.forEach(b=>{
+   b.walletId=Number(b.walletId)||0;
+   b.amount=Number(b.amount)||0;
    if(!b.mainCategory&&b.category)b.mainCategory=b.category;
    if(!b.mainCategory)b.mainCategory="Tagihan";
+   if(!b.category)b.category=b.mainCategory;
    if(!b.subcategory)b.subcategory="";
    if(!Array.isArray(b.history))b.history=[];
-   // Migrasi payments v11.x ke history v12.
    if(b.payments&&typeof b.payments==="object"){
      Object.entries(b.payments).forEach(([month,p])=>{
-       if(!b.history.some(h=>String(h.month)===String(month)&&Number(h.txId||0)===Number(p?.txId||0))){
-         const paidDate=(p?.paidAt||p?.paidDate||p?.date||"").slice(0,10) || today();
-         b.history.push({
-           month,
-           amount:Number(p?.amount||b.amount||0),
-           paidDate,
-           txId:p?.txId||null
-         });
+       const txId=Number(p?.txId)||null;
+       if(!b.history.some(h=>String(h.month)===String(month)&&Number(h.txId||0)===Number(txId||0))){
+         const paidDate=(p?.paidAt||p?.paidDate||p?.date||"").slice(0,10)||today();
+         b.history.push({month,amount:Number(p?.amount||b.amount||0),paidDate,txId});
        }
      });
    }
  });
 
- if(!Number.isFinite(+d.nextWallet)){
-   d.nextWallet=Math.max(0,...d.wallets.map(w=>Number(w.id)||0))+1;
- }
- if(!Number.isFinite(+d.nextTx)){
-   d.nextTx=Math.max(0,...d.tx.map(t=>Number(t.id)||0))+1;
- }
+ // Jangan percaya next id lama kalau lebih kecil dari data yang sudah ada.
+ const maxWallet=Math.max(0,...d.wallets.map(w=>Number(w.id)||0));
+ const maxTx=Math.max(0,...d.tx.map(t=>Number(t.id)||0));
+ d.nextWallet=Math.max(Number(d.nextWallet)||1,maxWallet+1);
+ d.nextTx=Math.max(Number(d.nextTx)||1,maxTx+1);
  return d
 }
 function openDB(){
@@ -572,6 +660,7 @@ async function initStorage(){
  }
 }
 async function save(){
+ renderAll();
  try{
    if(storageMode==="indexeddb"&&db){
      await idbSet(STATE_KEY,data);
@@ -581,7 +670,6 @@ async function save(){
  }catch(e){
    try{localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data))}catch(_){}
  }
- renderAll();
 }
 function tr(k){return I18N[lang]?.[k]||I18N.id[k]||k}
 function applyLanguage(){
@@ -593,6 +681,12 @@ function applyLanguage(){
 }
 function setLanguage(v){lang=v;localStorage.setItem(LANG_KEY,v);applyLanguage()}
 function rp(n){return fmt.format(Number(n)||0)}
+function showToast(msg){
+ const el=$("toast");if(!el)return;
+ el.textContent=msg;el.classList.add("show");
+ clearTimeout(window.__toastTimer);
+ window.__toastTimer=setTimeout(()=>el.classList.remove("show"),1600);
+}
 function money(v){return Number(String(v||"").replace(/\D/g,""))||0}
 function today(){return new Date().toISOString().slice(0,10)}
 function mk(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`}
@@ -605,14 +699,81 @@ function go(id){
  $("backBtn").classList.toggle("hidden",id==="home");
  window.scrollTo({top:0,behavior:"smooth"})
 }
+
+
+
+
+
+function openQuickTransaction(type,event){
+  if(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  const visible=data.wallets.filter(w=>!w.hidden);
+  if(!visible.length){
+    alert(lang==="en"
+      ?"No visible wallet is available. Unhide or add a wallet first."
+      :"Tidak ada dompet aktif. Tampilkan kembali atau tambah dompet terlebih dahulu.");
+    return;
+  }
+
+  const quick=$("quickAddModal");
+  const tx=$("txModal");
+
+  // Tutup popup pilihan tanpa mengubah scroll/body lebih dulu.
+  quick.classList.remove("show","keyboard-up");
+
+  // Siapkan form transaksi secara sinkron pada klik yang sama.
+  prepareTxForm(type,null);
+
+  // Langsung tampilkan popup input.
+  tx.classList.add("show");
+  document.body.style.overflow="hidden";
+}
+
+function updateModalKeyboardState(){
+  const open=document.querySelector(".modal-bg.show");
+  if(!open)return;
+  const vv=window.visualViewport;
+  const keyboardLikely=vv ? (window.innerHeight-vv.height>140) : false;
+  const focused=document.activeElement && ["INPUT","SELECT","TEXTAREA"].includes(document.activeElement.tagName);
+  open.classList.toggle("keyboard-up",keyboardLikely||focused);
+}
+document.addEventListener("focusin",e=>{
+  if(e.target.matches("input,select,textarea")){
+    const modal=e.target.closest(".modal-bg");
+    if(modal)modal.classList.add("keyboard-up");
+    setTimeout(()=>{
+      try{e.target.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}
+    },180);
+  }
+});
+document.addEventListener("focusout",()=>{
+  setTimeout(()=>{
+    document.querySelectorAll(".modal-bg").forEach(m=>m.classList.remove("keyboard-up"));
+    updateModalKeyboardState();
+  },160);
+});
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize",updateModalKeyboardState);
+}
+
 function openModal(id){$(id).classList.add("show");document.body.style.overflow="hidden"}
-function closeModal(id){$(id).classList.remove("show");document.body.style.overflow=""}
+function closeModal(id){$(id).classList.remove("show","keyboard-up");document.body.style.overflow=""}
 function visibleWalletIds(){return new Set(data.wallets.filter(w=>!w.hidden).map(w=>w.id))}
 function txIsVisible(t){const vis=visibleWalletIds();if(t.type==="TRANSFER")return vis.has(t.walletId)&&vis.has(t.toWalletId);return vis.has(t.walletId)}
 function visibleTx(){return data.tx.filter(txIsVisible)}
 function populateWallets(){
- const o=data.wallets.map(w=>`<option value="${w.id}">${esc(w.name)}${w.hidden?" (Hidden)":""}</option>`).join("");
+ const visible=data.wallets.filter(w=>!w.hidden);
+ const source=visible.length?visible:data.wallets;
+ const o=source.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join("");
  ["txWallet","txTo","billWallet"].forEach(id=>$(id).innerHTML=o)
+}
+function selectFirstVisibleWallet(selectId){
+ const el=$(selectId);if(!el)return;
+ const first=data.wallets.find(w=>!w.hidden)||data.wallets[0];
+ if(first)el.value=String(first.id);
 }
 function walletBalance(id){
  const w=data.wallets.find(x=>x.id===+id);if(!w)return 0;let b=+w.opening||0;
@@ -621,7 +782,7 @@ function walletBalance(id){
 }
 function totalBalance(){return data.wallets.filter(w=>!w.hidden).reduce((s,w)=>s+walletBalance(w.id),0)}
 function monthTx(){return visibleTx().filter(t=>String(t.date).slice(0,7)===mk())}
-function arrowSvg(type){if(type==="INCOME")return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19V5"/><path d="m7 10 5-5 5 5"/></svg>';if(type==="EXPENSE")return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14"/><path d="m17 14-5 5-5-5"/></svg>';return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 7h10M14 4l3 3-3 3M17 17H7M10 14l-3 3 3 3"/></svg>'}
+function arrowSvg(type){if(type==="INCOME")return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14"/><path d="m17 14-5 5-5-5"/></svg>';if(type==="EXPENSE")return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19V5"/><path d="m7 10 5-5 5 5"/></svg>';return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 7h10M14 4l3 3-3 3M17 17H7M10 14l-3 3 3 3"/></svg>'}
 function txLabel(t){return t.type==="TRANSFER"?tr("transfer"):(t.subcategory||t.mainCategory||t.category||tr("transactions"))}
 function txMarkup(t){
  const w=data.wallets.find(x=>x.id===t.walletId),cls=t.type==="INCOME"?"income":t.type==="EXPENSE"?"expense":"",sign=t.type==="INCOME"?"+":t.type==="EXPENSE"?"−":"↔";
@@ -658,31 +819,141 @@ function refreshBillSubcategorySelect(){
  const cats=data.categories.EXPENSE||{},main=$("billMainCat").value;
  $("billSubCat").innerHTML=(cats[main]||[]).map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("")
 }
-function openTx(type="EXPENSE",locked=true,id=null){
+function prepareTxForm(type="EXPENSE",id=null){
  populateWallets();
+
+ const visible=data.wallets.filter(w=>!w.hidden);
+ if(!visible.length)return false;
+
  $("txId").value=id||"";
  $("txLockedType").value=type;
- $("txTitle").textContent=type==="EXPENSE"?(lang==="en"?"Add Expense":"Tambah Pengeluaran"):type==="INCOME"?(lang==="en"?"Add Income":"Tambah Pemasukan"):(lang==="en"?"Add Transfer":"Tambah Transfer");
+ $("txTitle").textContent=
+   type==="EXPENSE"?(lang==="en"?"Add Expense":"Tambah Pengeluaran"):
+   type==="INCOME"?(lang==="en"?"Add Income":"Tambah Pemasukan"):
+   (lang==="en"?"Add Transfer":"Tambah Transfer");
+
  $("deleteTxBtn").classList.toggle("hidden",!id);
  $("toWrap").classList.toggle("hidden",type!=="TRANSFER");
  $("mainCatWrap").classList.toggle("hidden",type==="TRANSFER");
  $("subCatWrap").classList.toggle("hidden",type==="TRANSFER");
- $("txAmount").value="";$("txDate").value=today();$("txNote").value="";
+
+ $("txAmount").value="";
+ $("txDate").value=today();
+ $("txNote").value="";
+
+ if(!id){
+   $("txWallet").value=String(visible[0].id);
+
+   if(type==="TRANSFER"){
+     if(visible.length<2){
+       alert(lang==="en"
+         ?"At least two visible wallets are required for a transfer."
+         :"Transfer membutuhkan minimal dua dompet aktif.");
+       return false;
+     }
+     $("txWallet").value=String(visible[0].id);
+     $("txTo").value=String(visible[1].id);
+   }
+ }
+
  if(id){
-   const t=data.tx.find(x=>x.id===id);if(!t)return;
-   $("txAmount").value=t.amount.toLocaleString("id-ID");$("txWallet").value=t.walletId;$("txTo").value=t.toWalletId||"";$("txDate").value=t.date;$("txNote").value=t.note||"";
-   if(type!=="TRANSFER")fillCategorySelects(type,"txMainCat","txSubCat",t.mainCategory||t.category,t.subcategory||"")
- }else if(type!=="TRANSFER"){fillCategorySelects(type,"txMainCat","txSubCat")}
- openModal("txModal")
+   const t=data.tx.find(x=>Number(x.id)===Number(id));
+   if(!t)return false;
+
+   // Jika transaksi lama berasal dari dompet yang sekarang hidden,
+   // tetap izinkan edit dengan sementara menambahkan pilihan dompet tersebut.
+   const currentWallet=data.wallets.find(w=>w.id===Number(t.walletId));
+   if(currentWallet && currentWallet.hidden){
+     const option=document.createElement("option");
+     option.value=String(currentWallet.id);
+     option.textContent=currentWallet.name+" (Hidden)";
+     $("txWallet").appendChild(option);
+   }
+   if(type==="TRANSFER"){
+     const currentTo=data.wallets.find(w=>w.id===Number(t.toWalletId));
+     if(currentTo && currentTo.hidden){
+       const option=document.createElement("option");
+       option.value=String(currentTo.id);
+       option.textContent=currentTo.name+" (Hidden)";
+       $("txTo").appendChild(option);
+     }
+   }
+
+   $("txAmount").value=Number(t.amount).toLocaleString("id-ID");
+   $("txWallet").value=String(t.walletId);
+   $("txTo").value=t.toWalletId?String(t.toWalletId):"";
+   $("txDate").value=t.date||today();
+   $("txNote").value=t.note||"";
+
+   if(type!=="TRANSFER"){
+     fillCategorySelects(
+       type,
+       "txMainCat",
+       "txSubCat",
+       t.mainCategory||t.category,
+       t.subcategory||""
+     );
+   }
+ }else if(type!=="TRANSFER"){
+   fillCategorySelects(type,"txMainCat","txSubCat");
+ }
+
+ return true;
 }
-function saveTx(){
- const amount=money($("txAmount").value),id=+$("txId").value,walletId=+$("txWallet").value,toWalletId=+$("txTo").value,type=$("txLockedType").value;
- if(amount<=0)return alert(lang==="en"?"Enter an amount.":"Isi nominal dulu.");
- if(type==="TRANSFER"&&walletId===toWalletId)return alert(lang==="en"?"Source and destination wallets must be different.":"Dompet asal dan tujuan harus berbeda.");
- const o={id:id||data.nextTx++,type,amount,walletId,toWalletId,date:$("txDate").value||today(),note:$("txNote").value.trim(),mainCategory:type==="TRANSFER"?"Transfer":$("txMainCat").value,subcategory:type==="TRANSFER"?"":$("txSubCat").value};
- o.category=o.mainCategory;
- if(id)data.tx[data.tx.findIndex(t=>t.id===id)]=o;else data.tx.push(o);
- closeModal("txModal");save()
+
+function openTx(type="EXPENSE",locked=true,id=null){
+ const ok=prepareTxForm(type,id);
+ if(!ok)return;
+ openModal("txModal");
+}
+async function saveTx(){
+ const amount=money($("txAmount").value);
+ const editId=Number($("txId").value)||0;
+ const walletId=Number($("txWallet").value)||0;
+ const toWalletId=Number($("txTo").value)||0;
+ const type=String($("txLockedType").value||"EXPENSE").toUpperCase();
+
+ if(amount<=0)return alert(lang==="en"?"Enter a valid amount.":"Nominal belum benar.");
+ if(!walletId||!data.wallets.some(w=>w.id===walletId))return alert(lang==="en"?"Choose a wallet.":"Pilih dompet terlebih dahulu.");
+ if(type==="TRANSFER"){
+   if(!toWalletId||!data.wallets.some(w=>w.id===toWalletId))return alert(lang==="en"?"Choose destination wallet.":"Pilih dompet tujuan.");
+   if(walletId===toWalletId)return alert(lang==="en"?"Source and destination wallets must be different.":"Dompet asal dan tujuan harus berbeda.");
+ }
+
+ const mainCategory=type==="TRANSFER"?"Transfer":($("txMainCat").value||"Lainnya");
+ const subcategory=type==="TRANSFER"?"":($("txSubCat").value||"");
+ const tx={
+   id:editId||data.nextTx++,
+   type,
+   amount,
+   walletId,
+   date:$("txDate").value||today(),
+   note:$("txNote").value.trim(),
+   mainCategory,
+   subcategory,
+   category:mainCategory
+ };
+ if(type==="TRANSFER")tx.toWalletId=toWalletId;
+
+ if(editId){
+   const idx=data.tx.findIndex(t=>Number(t.id)===editId);
+   if(idx>=0)data.tx[idx]=tx;
+   else data.tx.push(tx);
+ }else{
+   data.tx.push(tx);
+ }
+
+ // Render dulu agar user langsung melihat hasil input.
+ renderAll();
+ closeModal("txModal");
+
+ try{
+   if(storageMode==="indexeddb"&&db)await idbSet(STATE_KEY,data);
+   else localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data));
+   showToast(type==="EXPENSE"?(lang==="en"?"Expense saved":"Pengeluaran tersimpan"):type==="INCOME"?(lang==="en"?"Income saved":"Pemasukan tersimpan"):(lang==="en"?"Transfer saved":"Transfer tersimpan"));
+ }catch(e){
+   alert(lang==="en"?"Transaction was added on screen, but saving to storage failed. Please backup your data.":"Transaksi tampil, tapi gagal disimpan ke penyimpanan. Segera lakukan backup data.");
+ }
 }
 function openTxDetail(id){
  const t=data.tx.find(x=>x.id===id);if(!t||!txIsVisible(t))return;currentTxDetailId=id;
@@ -800,28 +1071,28 @@ function renderCategoryManager(){
  ["EXPENSE","INCOME"].forEach(type=>{Object.entries(data.categories[type]||{}).forEach(([main,subs])=>out.push(`<div class="category-group"><b>${type==="EXPENSE"?(lang==="en"?"Expense":"Pengeluaran"):(lang==="en"?"Income":"Pemasukan")} · ${esc(main)}</b><div class="subcategory-list">${subs.map(esc).join(" · ")||"-"}</div></div>`))});
  $("categoryManager").innerHTML=out.join("")
 }
-function openSubcategoryModal(){refreshMainCategoryManager();$("subName").value="";openModal("subcategoryModal")}
-function refreshMainCategoryManager(){const type=$("subType").value;$("subMainCat").innerHTML=Object.keys(data.categories[type]||{}).map(c=>`<option>${esc(c)}</option>`).join("")}
-function saveSubcategory(){const type=$("subType").value,main=$("subMainCat").value,name=$("subName").value.trim();if(!name)return;data.categories[type][main]=data.categories[type][main]||[];if(!data.categories[type][main].includes(name))data.categories[type][main].push(name);closeModal("subcategoryModal");save()}
-
-const SETTING_COLLAPSE_KEY="noted_v3_setting_collapsed";
-
-function getSettingCollapseState(){
-  try{return JSON.parse(localStorage.getItem(SETTING_COLLAPSE_KEY))||{}}catch(e){return{}}
+function openSubcategoryModal(){$("subType").value="EXPENSE";$("subName").value="";refreshMainCategoryManager();openModal("subcategoryModal")}
+function refreshMainCategoryManager(){
+ const type=$("subType").value;
+ const cats=data.categories[type]||{};
+ const names=Object.keys(cats);
+ $("subMainCat").innerHTML=names.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
 }
-function applySettingCollapseState(){
-  const state=getSettingCollapseState();
-  document.querySelectorAll("[data-setting-card]").forEach(card=>{
-    card.classList.toggle("collapsed",!!state[card.dataset.settingCard]);
-  });
+async function saveSubcategory(){
+ const type=$("subType").value;
+ const main=$("subMainCat").value;
+ const name=$("subName").value.trim();
+ if(!main)return alert(lang==="en"?"Choose a main category.":"Pilih kategori utama.");
+ if(!name)return alert(lang==="en"?"Enter a subcategory name.":"Isi nama subkategori.");
+ if(!data.categories[type])data.categories[type]={};
+ if(!Array.isArray(data.categories[type][main]))data.categories[type][main]=[];
+ const exists=data.categories[type][main].some(x=>String(x).toLowerCase()===name.toLowerCase());
+ if(exists)return alert(lang==="en"?"Subcategory already exists.":"Subkategori sudah ada.");
+ data.categories[type][main].push(name);
+ await save();
+ closeModal("subcategoryModal");
+ showToast(lang==="en"?"Subcategory added":"Subkategori ditambahkan");
 }
-function toggleSettingCard(key){
-  const state=getSettingCollapseState();
-  state[key]=!state[key];
-  localStorage.setItem(SETTING_COLLAPSE_KEY,JSON.stringify(state));
-  applySettingCollapseState();
-}
-
 function renderSettings(){
  $("userDisplayName").textContent=data.user.name||"User";$("userDisplayEmail").textContent=data.user.email||(lang==="en"?"No email":"Belum ada email");
  renderCategoryManager();
@@ -837,7 +1108,7 @@ function getNotifications(){
 }
 function updateNotifications(){const n=getNotifications().length;$("notifyDot").textContent=n;$("notifyDot").classList.toggle("hidden",n===0)}
 function openNotifications(){const n=getNotifications();$("notificationsList").innerHTML=n.length?n.map(x=>`<div class="notify-item"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join(""):`<div class="empty">${lang==="en"?"No notifications.":"Tidak ada notifikasi."}</div>`;openModal("notificationsModal")}
-function backupData(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({app:"Dompet Lokal",version:"12.0",data},null,2)],{type:"application/json"}));a.href=url;a.download=`dompet-lokal-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
+function backupData(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({app:"Dompet Lokal",version:"12.4",data},null,2)],{type:"application/json"}));a.href=url;a.download=`dompet-lokal-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
 $("restoreFile").onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const p=JSON.parse(await f.text()),d=normalize(p.data||p);if(!d.wallets||!d.tx||!d.bills)throw 0;if(confirm(lang==="en"?"Replace current data?":"Ganti semua data saat ini?")){data=d;await save()}}catch(_){alert(lang==="en"?"Invalid backup file.":"File backup tidak valid.")}e.target.value=""}
 function resetData(){if(confirm(lang==="en"?"Delete all data?":"Hapus semua data?")&&confirm(lang==="en"?"Are you sure?":"Yakin?")){data=defaultData();save()}}
 function loadDemo(){
@@ -870,5 +1141,6 @@ async function startApp(){
 }
 startApp();
 </script>
+<div id="toast" class="toast">Tersimpan</div>
 </body>
 </html>
