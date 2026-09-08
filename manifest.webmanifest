@@ -1,7 +1,7 @@
 {
-  "name": "Dompet Lokal",
-  "short_name": "Dompet Lokal",
-  "description": "Aplikasi pencatat keuangan pribadi yang menyimpan data lokal di perangkat.",
+  "name": "Noted",
+  "short_name": "Noted",
+  "description": "Noted - catatan keuangan simple dengan Dompet, Tagihan, Hutang/Cicilan, dan Piutang.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
