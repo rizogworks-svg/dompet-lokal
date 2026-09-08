@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#eef0f2">
 <title>Noted</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <style>
 :root{
   --bg:#eef0f2;
@@ -19,6 +23,7 @@
   --shadow:0 12px 30px rgba(24,28,32,.06);
   --radius-xl:28px;--radius-lg:22px;--radius-md:18px;
   --font:Inter,Roboto,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);font-family:var(--font);color:var(--ink)}
@@ -106,7 +111,7 @@ button{cursor:pointer}
 .nav-btn{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px 2px;color:#8b9094;font-size:7.5px;font-weight:700}
 .nav-btn.active{color:var(--ink)}.nav-icon{width:31px;height:31px;border-radius:10px;display:grid;place-items:center}.nav-btn.active .nav-icon{background:var(--accent);color:#fff}
 .nav-icon svg{width:19px;height:19px;stroke-width:1.8}
-.modal-bg{position:fixed;inset:0;background:rgba(12,14,16,.34);display:none;align-items:center;justify-content:center;padding:18px 12px;z-index:100;overflow:auto}
+.modal-bg{position:fixed;inset:0;background:rgba(12,14,16,.34);display:none;align-items:center;justify-content:center;padding:18px 12px;z-index:220;overflow:auto}
 .modal-bg.show{display:flex}
 .modal{width:min(470px,100%);max-height:calc(100dvh - 96px);overflow:auto;background:var(--surface);border-radius:24px;padding:16px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}.modal-head h3{margin:0;font-size:13px}
@@ -490,6 +495,351 @@ button{cursor:pointer}
   }
 }
 
+
+/* ===== Wallet Modal Stable ===== */
+.wallet-modal-bg{
+  align-items:center !important;
+  justify-content:center !important;
+  padding:18px 12px !important;
+}
+.wallet-modal-bg.keyboard-up{
+  align-items:flex-start !important;
+  padding-top:28px !important;
+}
+.wallet-modal{
+  max-height:calc(100dvh - 42px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+.wallet-modal input,
+.wallet-modal select,
+.wallet-modal button{
+  touch-action:manipulation;
+}
+
+
+/* ===== Compact Hidden Wallet Card ===== */
+.wallet-card{
+  transition:padding .18s ease, opacity .18s ease, min-height .18s ease, transform .18s ease;
+}
+.wallet-card.hidden-wallet{
+  padding:9px 11px !important;
+  min-height:48px !important;
+  opacity:.72;
+  display:grid;
+  grid-template-columns:32px 1fr auto;
+  align-items:center;
+  gap:9px;
+}
+.wallet-card.hidden-wallet .wallet-eye{
+  position:static !important;
+  width:30px !important;
+  height:30px !important;
+  min-width:30px !important;
+  margin:0 !important;
+}
+.wallet-card.hidden-wallet small{
+  display:none !important;
+}
+.wallet-card.hidden-wallet .wallet-name{
+  font-size:9px !important;
+  line-height:1.2;
+  margin:0 !important;
+}
+.wallet-card.hidden-wallet .wallet-name::after{
+  content:" · Hidden";
+  font-size:6.8px;
+  font-weight:700;
+  color:var(--muted);
+}
+.wallet-card.hidden-wallet .wallet-balance{
+  font-size:8px !important;
+  margin:0 !important;
+  letter-spacing:1px;
+  color:var(--muted);
+}
+@media (max-width:420px){
+  .wallet-card.hidden-wallet{
+    min-height:44px !important;
+    padding:8px 10px !important;
+  }
+}
+
+
+
+/* ===== Font Size Setting v2 - Real Pixel Overrides ===== */
+body.font-medium .app-title{font-size:19px!important}
+body.font-large .app-title{font-size:22px!important}
+
+body.font-medium .balance-label{font-size:13.5px!important}
+body.font-large .balance-label{font-size:15px!important}
+body.font-medium .balance-value{font-size:39px!important}
+body.font-large .balance-value{font-size:43px!important}
+body.font-medium .balance-sub{font-size:10px!important}
+body.font-large .balance-sub{font-size:11px!important}
+
+body.font-medium .quick-label{font-size:9px!important}
+body.font-large .quick-label{font-size:10px!important}
+body.font-medium .section-head h2{font-size:15.5px!important}
+body.font-large .section-head h2{font-size:17px!important}
+body.font-medium .see-all{font-size:10px!important}
+body.font-large .see-all{font-size:11px!important}
+
+body.font-medium .tx-name{font-size:12px!important}
+body.font-large .tx-name{font-size:13.5px!important}
+body.font-medium .tx-meta{font-size:9.5px!important}
+body.font-large .tx-meta{font-size:10.5px!important}
+body.font-medium .tx-amount{font-size:13px!important}
+body.font-large .tx-amount{font-size:14.5px!important}
+body.font-medium .empty{font-size:10.5px!important}
+body.font-large .empty{font-size:12px!important}
+
+body.font-medium .wallet-hero h2{font-size:18px!important}
+body.font-large .wallet-hero h2{font-size:20px!important}
+body.font-medium .wallet-hero p{font-size:10px!important}
+body.font-large .wallet-hero p{font-size:11px!important}
+body.font-medium .wallet-name{font-size:12px!important}
+body.font-large .wallet-name{font-size:13.5px!important}
+body.font-medium .wallet-balance{font-size:20px!important}
+body.font-large .wallet-balance{font-size:22px!important}
+body.font-medium .wallet-card small{font-size:9px!important}
+body.font-large .wallet-card small{font-size:10px!important}
+body.font-medium .wallet-hidden-badge{font-size:8px!important}
+body.font-large .wallet-hidden-badge{font-size:9px!important}
+
+body.font-medium .bill-name{font-size:12px!important}
+body.font-large .bill-name{font-size:13.5px!important}
+body.font-medium .bill-meta{font-size:9px!important}
+body.font-large .bill-meta{font-size:10px!important}
+body.font-medium .badge{font-size:8.5px!important}
+body.font-large .badge{font-size:9.5px!important}
+body.font-medium .bill-amount{font-size:19px!important}
+body.font-large .bill-amount{font-size:21px!important}
+
+body.font-medium .btn{font-size:9.5px!important}
+body.font-large .btn{font-size:10.5px!important}
+body.font-medium .analytics-card small{font-size:9.5px!important}
+body.font-large .analytics-card small{font-size:10.5px!important}
+body.font-medium .analytics-card b{font-size:18px!important}
+body.font-large .analytics-card b{font-size:20px!important}
+body.font-medium .bar-top{font-size:9.5px!important}
+body.font-large .bar-top{font-size:10.5px!important}
+
+body.font-medium .setting-title{font-size:13.5px!important}
+body.font-large .setting-title{font-size:15px!important}
+body.font-medium .setting-sub{font-size:9.5px!important}
+body.font-large .setting-sub{font-size:10.5px!important}
+body.font-medium .setting-row{font-size:11px!important}
+body.font-large .setting-row{font-size:12px!important}
+body.font-medium .setting-row small{font-size:9px!important}
+body.font-large .setting-row small{font-size:10px!important}
+body.font-medium .category-group b{font-size:10px!important}
+body.font-large .category-group b{font-size:11px!important}
+body.font-medium .subcategory-list{font-size:9px!important}
+body.font-large .subcategory-list{font-size:10px!important}
+
+body.font-medium .nav-btn{font-size:8.5px!important}
+body.font-large .nav-btn{font-size:9.5px!important}
+
+body.font-medium .modal-head h3{font-size:14.5px!important}
+body.font-large .modal-head h3{font-size:16px!important}
+body.font-medium .field span{font-size:9px!important}
+body.font-large .field span{font-size:10px!important}
+body.font-medium .input,
+body.font-medium .select{font-size:11px!important}
+body.font-large .input,
+body.font-large .select{font-size:12.5px!important}
+body.font-medium .detail-item small{font-size:8.5px!important}
+body.font-large .detail-item small{font-size:9.5px!important}
+body.font-medium .detail-item b{font-size:11px!important}
+body.font-large .detail-item b{font-size:12.5px!important}
+body.font-medium .detail-note{font-size:10px!important}
+body.font-large .detail-note{font-size:11px!important}
+body.font-medium .action-sheet button{font-size:11px!important}
+body.font-large .action-sheet button{font-size:12px!important}
+body.font-medium .notify-item b{font-size:11px!important}
+body.font-large .notify-item b{font-size:12px!important}
+body.font-medium .notify-item p{font-size:9px!important}
+body.font-large .notify-item p{font-size:10px!important}
+body.font-medium .history-item{font-size:9.5px!important}
+body.font-large .history-item{font-size:10.5px!important}
+
+body.font-medium .finance-title{font-size:10.5px!important}
+body.font-large .finance-title{font-size:11.5px!important}
+body.font-medium .finance-sub{font-size:8.5px!important}
+body.font-large .finance-sub{font-size:9.5px!important}
+body.font-medium .finance-summary b{font-size:10px!important}
+body.font-large .finance-summary b{font-size:11px!important}
+body.font-medium .finance-table th{font-size:8.5px!important}
+body.font-large .finance-table th{font-size:9.5px!important}
+body.font-medium .finance-table td{font-size:9.5px!important}
+body.font-large .finance-table td{font-size:10.5px!important}
+body.font-medium .finance-mini-btn{font-size:8.5px!important}
+body.font-large .finance-mini-btn{font-size:9.5px!important}
+body.font-medium .finance-status{font-size:8px!important}
+body.font-large .finance-status{font-size:9px!important}
+
+body.font-medium .debt-detail-label{font-size:8px!important}
+body.font-large .debt-detail-label{font-size:9px!important}
+body.font-medium .debt-detail-value{font-size:10px!important}
+body.font-large .debt-detail-value{font-size:11px!important}
+
+/* Layout guards so larger fonts remain tidy */
+body.font-medium .setting-row,
+body.font-large .setting-row{
+  gap:10px;
+}
+body.font-large .wallet-fin-tab{
+  padding:10px 4px!important;
+  line-height:1.15;
+}
+body.font-large .finance-table th,
+body.font-large .finance-table td{
+  padding-left:4px!important;
+  padding-right:4px!important;
+}
+body.font-large .bottom-nav{
+  min-height:68px;
+}
+body.font-large .modal{
+  width:min(94vw,520px);
+}
+/* Keep spacing compact while enlarging typography */
+body.font-medium .finance-table th,
+body.font-medium .finance-table td,
+body.font-large .finance-table th,
+body.font-large .finance-table td{
+  line-height:1.25;
+}
+body.font-large .bottom-nav{
+  min-height:68px;
+}
+body.font-large .nav-btn{
+  gap:3px;
+}
+body.font-large .modal{
+  max-width:min(94vw,520px);
+}
+body.font-large .wallet-fin-tab{
+  padding:10px 5px;
+}
+body.font-large .finance-mini-btn{
+  padding:7px 5px;
+}
+body.font-large .debt-compact-table th,
+body.font-large .debt-compact-table td,
+body.font-large .bill-compact-table th,
+body.font-large .bill-compact-table td,
+body.font-large .receivable-compact-table th,
+body.font-large .receivable-compact-table td{
+  padding-left:4px;
+  padding-right:4px;
+}
+
+
+/* ===== Full Screen Finance Pages ===== */
+.finance-launch-grid{
+  display:grid;
+  gap:10px;
+  margin-top:16px;
+}
+.finance-launch-card{
+  width:100%;
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:18px;
+  padding:13px;
+  display:grid;
+  grid-template-columns:38px 1fr auto;
+  align-items:center;
+  gap:10px;
+  text-align:left;
+  color:inherit;
+}
+.finance-launch-icon{
+  width:38px;
+  height:38px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:var(--surface-soft);
+  font-size:16px;
+  font-weight:800;
+}
+.finance-launch-text{
+  min-width:0;
+}
+.finance-launch-text b{
+  display:block;
+  font-size:10px;
+  margin-bottom:2px;
+}
+.finance-launch-text small{
+  display:block;
+  font-size:7.5px;
+  color:var(--muted);
+  line-height:1.3;
+}
+.finance-launch-card > span{
+  font-size:20px;
+  color:var(--muted);
+}
+
+.finance-fullpage{
+  position:fixed;
+  inset:0;
+  z-index:120;
+  background:var(--bg);
+  display:none;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+.finance-fullpage.show{
+  display:block;
+}
+.finance-fullpage-header{
+  position:sticky;
+  top:0;
+  z-index:3;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  padding:14px 14px 12px;
+  display:grid;
+  grid-template-columns:42px 1fr 42px;
+  align-items:center;
+  gap:10px;
+}
+.finance-fullpage-header h2{
+  margin:0;
+  font-size:16px;
+}
+.finance-fullpage-header p{
+  margin:2px 0 0;
+  font-size:8px;
+  color:var(--muted);
+}
+.back-btn-inline{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:var(--surface);
+  font-size:24px;
+  line-height:1;
+}
+.finance-fullpage-body{
+  padding:14px 12px 96px;
+}
+.finance-fullpage .finance-table-wrap{
+  border-radius:16px;
+}
+.finance-fullpage .empty{
+  margin-top:12px;
+}
+body.finance-page-open{
+  overflow:hidden;
+}
+
 </style>
 </head>
 <body>
@@ -550,26 +900,36 @@ button{cursor:pointer}
   </div>
   <div id="walletGrid" class="wallet-grid"></div>
 
-  <div class="wallet-finance-tabs">
-    <button class="wallet-fin-tab active" data-fin-tab="bills" onclick="switchWalletFinanceTab('bills')">Tagihan</button>
-    <button class="wallet-fin-tab" data-fin-tab="debts" onclick="switchWalletFinanceTab('debts')">Hutang / Cicilan</button>
-    <button class="wallet-fin-tab" data-fin-tab="receivables" onclick="switchWalletFinanceTab('receivables')">Piutang</button>
+  
+  <div class="finance-launch-grid">
+    <button class="finance-launch-card" type="button" onclick="openFinancePage('bills')">
+      <div class="finance-launch-icon">▣</div>
+      <div class="finance-launch-text">
+        <b>Tagihan</b>
+        <small id="billLaunchSummary">Kelola tagihan rutin</small>
+      </div>
+      <span>›</span>
+    </button>
+
+    <button class="finance-launch-card" type="button" onclick="openFinancePage('debts')">
+      <div class="finance-launch-icon">↗</div>
+      <div class="finance-launch-text">
+        <b>Hutang / Cicilan</b>
+        <small id="debtLaunchSummary">Kelola hutang dan cicilan</small>
+      </div>
+      <span>›</span>
+    </button>
+
+    <button class="finance-launch-card" type="button" onclick="openFinancePage('receivables')">
+      <div class="finance-launch-icon">↙</div>
+      <div class="finance-launch-text">
+        <b>Piutang</b>
+        <small id="receivableLaunchSummary">Kelola uang yang harus diterima</small>
+      </div>
+      <span>›</span>
+    </button>
   </div>
 
-  <div id="walletFinanceBills" class="wallet-fin-panel active">
-    <div class="section-head"><h2>Tagihan</h2><button class="see-all" onclick="openBill()">+ Tagihan</button></div>
-    <div id="billTable"></div>
-  </div>
-
-  <div id="walletFinanceDebts" class="wallet-fin-panel">
-    <div class="section-head"><h2>Hutang / Cicilan</h2><button class="see-all" onclick="openDebtModal()">+ Hutang</button></div>
-    <div id="debtTable"></div>
-  </div>
-
-  <div id="walletFinanceReceivables" class="wallet-fin-panel">
-    <div class="section-head"><h2>Piutang</h2><button class="see-all" onclick="openReceivableModal()">+ Piutang</button></div>
-    <div id="receivableTable"></div>
-  </div>
 </section>
 
 <section id="analytics" class="page">
@@ -643,7 +1003,29 @@ button{cursor:pointer}
     </div>
   </details>
 
-  <details class="setting-card setting-drop" data-setting-key="data" open>
+  
+  <details class="setting-card setting-drop" data-setting-key="fontSize" open>
+    <summary class="setting-drop-head">
+      <span class="setting-title">Ukuran Font</span>
+      <span class="setting-drop-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6 9 6 6 6-6"/></svg>
+      </span>
+    </summary>
+    <div class="setting-drop-body">
+      <div class="setting-sub">Pilih ukuran teks aplikasi. Kecil adalah ukuran default.</div>
+      <button class="setting-row" type="button" onclick="setFontSize('small')">
+        <span>Kecil<small>Ukuran default</small></span><span id="fontSmallMark">✓</span>
+      </button>
+      <button class="setting-row" type="button" onclick="setFontSize('medium')">
+        <span>Menengah<small>Lebih nyaman dibaca</small></span><span id="fontMediumMark"></span>
+      </button>
+      <button class="setting-row" type="button" onclick="setFontSize('large')">
+        <span>Besar<small>Teks lebih besar, layout tetap rapi</small></span><span id="fontLargeMark"></span>
+      </button>
+    </div>
+  </details>
+
+<details class="setting-card setting-drop" data-setting-key="data" open>
     <summary class="setting-drop-head">
       <span class="setting-title" data-i18n="data">Data</span>
       <span class="setting-drop-arrow">
@@ -660,6 +1042,49 @@ button{cursor:pointer}
   </details>
 
 </section>
+
+
+<div id="financePageBills" class="finance-fullpage">
+  <div class="finance-fullpage-header">
+    <button class="back-btn-inline" type="button" onclick="closeFinancePage()">‹</button>
+    <div>
+      <h2>Tagihan</h2>
+      <p>Kelola semua tagihan rutin.</p>
+    </div>
+    <button class="plus-circle" type="button" onclick="openBill()">+</button>
+  </div>
+  <div class="finance-fullpage-body">
+    <div id="billTable"></div>
+  </div>
+</div>
+
+<div id="financePageDebts" class="finance-fullpage">
+  <div class="finance-fullpage-header">
+    <button class="back-btn-inline" type="button" onclick="closeFinancePage()">‹</button>
+    <div>
+      <h2>Hutang / Cicilan</h2>
+      <p>Kelola hutang, cicilan, dan pembayaran.</p>
+    </div>
+    <button class="plus-circle" type="button" onclick="openDebtModal()">+</button>
+  </div>
+  <div class="finance-fullpage-body">
+    <div id="debtTable"></div>
+  </div>
+</div>
+
+<div id="financePageReceivables" class="finance-fullpage">
+  <div class="finance-fullpage-header">
+    <button class="back-btn-inline" type="button" onclick="closeFinancePage()">‹</button>
+    <div>
+      <h2>Piutang</h2>
+      <p>Kelola piutang dan pembayaran yang masuk.</p>
+    </div>
+    <button class="plus-circle" type="button" onclick="openReceivableModal()">+</button>
+  </div>
+  <div class="finance-fullpage-body">
+    <div id="receivableTable"></div>
+  </div>
+</div>
 
 <nav class="bottom-nav">
   <button class="nav-btn active" data-nav="home" onclick="go('home')"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></span><span data-i18n="home">Home</span></button>
@@ -723,14 +1148,50 @@ button{cursor:pointer}
   <div id="txDetailContent"></div>
 </div></div>
 
-<div id="walletModal" class="modal-bg" onclick="if(event.target===this)closeModal('walletModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
-  <div class="modal-head"><h3 id="walletTitle">Tambah Dompet</h3><button class="close" onclick="closeModal('walletModal')">×</button></div>
-  <input id="walletId" type="hidden">
-  <label class="field"><span data-i18n="walletName">Nama Dompet</span><input id="walletName" class="input" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
-  <label class="field"><span data-i18n="openingBalance">Saldo Awal</span><input id="walletOpening" class="input" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
-  <label class="field"><span data-i18n="walletVisibility">Visibilitas Dompet</span><select id="walletHidden" class="select"><option value="0">Tampilkan</option><option value="1">Hide dari saldo & analitik</option></select></label>
-  <div class="bill-actions"><button id="deleteWalletBtn" class="btn danger hidden" onclick="deleteWallet()">Hapus</button><button class="btn primary grow" onclick="saveWallet()" data-i18n="save">Simpan</button></div>
-</div></div>
+<div id="walletModal" class="modal-bg wallet-modal-bg">
+  <div class="modal wallet-modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 id="walletTitle">Tambah Dompet</h3>
+      <button class="close" type="button" onclick="closeWalletModal()">×</button>
+    </div>
+
+    <input id="walletId" type="hidden">
+
+    <label class="field">
+      <span>Nama Dompet</span>
+      <input
+        id="walletName"
+        class="input"
+        type="text"
+        autocomplete="off"
+        enterkeyhint="next"
+        placeholder="Contoh: Dompet Utama">
+    </label>
+
+    <label class="field">
+      <span>Saldo Awal</span>
+      <input
+        id="walletOpening"
+        class="input"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="0">
+    </label>
+
+    <label class="field">
+      <span>Status Dompet</span>
+      <select id="walletHidden" class="select">
+        <option value="0">Tampilkan</option>
+        <option value="1">Sembunyikan</option>
+      </select>
+    </label>
+
+    <div class="bill-actions">
+      <button id="deleteWalletBtn" class="btn danger hidden" type="button" onclick="deleteWallet()">Hapus</button>
+      <button class="btn primary grow" type="button" onclick="saveWallet()">Simpan</button>
+    </div>
+  </div>
+</div>
 
 <div id="billModal" class="modal-bg" onclick="if(event.target===this)closeModal('billModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 id="billTitle">Tambah Tagihan</h3><button class="close" onclick="closeModal('billModal')">×</button></div>
@@ -828,20 +1289,20 @@ button{cursor:pointer}
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-head"><h3 id="debtModalTitle">Tambah Hutang / Cicilan</h3><button class="close" onclick="closeModal('debtModal')">×</button></div>
     <input id="debtId" type="hidden">
-    <label class="field"><span>Jenis</span>
+    <label class="field"><span data-i18n="financeType">Jenis</span>
       <select id="debtType" class="select" onchange="toggleDebtTypeFields()">
         <option value="INSTALLMENT">Cicilan</option>
         <option value="DEBT">Hutang Biasa</option>
       </select>
     </label>
-    <label class="field"><span>Nama Hutang</span><input id="debtName" class="input" type="text" placeholder="Contoh: Cicilan HP" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
-    <label class="field"><span>Total Hutang</span><input id="debtTotal" class="input" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+    <label class="field"><span data-i18n="financeDebtName">Nama Hutang</span><input id="debtName" class="input" type="text" placeholder="Contoh: Cicilan HP" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+    <label class="field"><span data-i18n="financeTotalDebt">Total Hutang</span><input id="debtTotal" class="input" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
     <div id="debtInstallmentFields">
-      <label class="field"><span>Jumlah Cicilan</span><input id="debtInstallmentCount" class="input" type="number" min="1" max="360" value="12" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
-      <label class="field"><span>Cicilan per Pembayaran</span><input id="debtInstallment" class="input" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+      <label class="field"><span data-i18n="financeInstallmentCount">Jumlah Cicilan</span><input id="debtInstallmentCount" class="input" type="number" min="1" max="360" value="12" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+      <label class="field"><span data-i18n="financeInstallmentAmount">Cicilan per Pembayaran</span><input id="debtInstallment" class="input" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
     </div>
-    <label class="field"><span>Jatuh Tempo</span><input id="debtDueDate" class="input" type="date" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
-    <label class="field"><span>Dompet Pembayaran</span><select id="debtWallet" class="select"></select></label>
+    <label class="field"><span data-i18n="financeDue">Jatuh Tempo</span><input id="debtDueDate" class="input" type="date" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+    <label class="field"><span data-i18n="financePaymentWallet">Dompet Pembayaran</span><select id="debtWallet" class="select"></select></label>
     <label class="field"><span>Catatan</span><input id="debtNote" class="input" type="text" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
     <div class="bill-actions"><button id="deleteDebtBtn" class="btn danger hidden" onclick="deleteDebt()">Hapus</button><button class="btn primary grow" onclick="saveDebt()">Simpan</button></div>
   </div>
@@ -897,12 +1358,23 @@ button{cursor:pointer}
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-head"><h3 id="receivableModalTitle">Tambah Piutang</h3><button class="close" onclick="closeModal('receivableModal')">×</button></div>
     <input id="receivableId" type="hidden">
-    <label class="field"><span>Nama Orang</span><input id="receivableName" class="input" type="text" placeholder="Contoh: Andi" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
-    <label class="field"><span>Total Piutang</span><input id="receivableTotal" class="input" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
-    <label class="field"><span>Target Pembayaran</span><input id="receivableDueDate" class="input" type="date" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
-    <label class="field"><span>Dompet Penerima</span><select id="receivableWallet" class="select"></select></label>
+    <label class="field"><span data-i18n="financePersonName">Nama Orang</span><input id="receivableName" class="input" type="text" placeholder="Contoh: Andi" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+    <label class="field"><span data-i18n="financeTotalReceivable">Total Piutang</span><input id="receivableTotal" class="input" inputmode="numeric" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+    <label class="field"><span data-i18n="financeTargetPayment">Target Pembayaran</span><input id="receivableDueDate" class="input" type="date" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
+    <label class="field"><span data-i18n="financeReceivingWallet">Dompet Penerima</span><select id="receivableWallet" class="select"></select></label>
     <label class="field"><span>Catatan</span><input id="receivableNote" class="input" type="text" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"></label>
     <div class="bill-actions"><button id="deleteReceivableBtn" class="btn danger hidden" onclick="deleteReceivable()">Hapus</button><button class="btn primary grow" onclick="saveReceivable()">Simpan</button></div>
+  </div>
+</div>
+
+<div id="financePaymentModal" class="modal-bg" onclick="if(event.target===this)closeModal('financePaymentModal')">
+  <div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
+    <div class="modal-head"><h3 id="financePaymentTitle" data-i18n="financePayment">Pembayaran</h3><button class="close" type="button" onclick="closeModal('financePaymentModal')">×</button></div>
+    <input id="financePaymentType" type="hidden">
+    <input id="financePaymentSourceId" type="hidden">
+    <label class="field"><span id="financePaymentLabel">Nominal</span><input id="financePaymentAmount" class="input" inputmode="numeric"></label>
+    <div id="financePaymentHint" class="detail-note" style="margin:0 0 10px"></div>
+    <button class="btn primary" type="button" style="width:100%" onclick="submitFinancePayment()">Simpan</button>
   </div>
 </div>
 
@@ -925,7 +1397,8 @@ button{cursor:pointer}
 const $=id=>document.getElementById(id);
 const fmt=new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0});
 const THEME_KEY="dompet_lokal_v12_theme",LANG_KEY="dompet_lokal_v12_lang";
-const DB_NAME="dompet_lokal_db",DB_VERSION=1,STORE_NAME="app",STATE_KEY="state";
+const NOTED_THEME_KEY="noted_theme",NOTED_LANG_KEY="noted_lang",NOTED_FALLBACK_KEY="noted_state_v2";
+const DB_NAME="dompet_lokal_db",DB_VERSION=1,STORE_NAME="app",STATE_KEY="state",SCHEMA_VERSION=2;
 const LEGACY_KEYS=[
   "dompet_lokal_v10_4_no_top_right_icons",
   "dompet_lokal_v10_3_topicon_fix",
@@ -949,9 +1422,16 @@ const I18N={
 id:{accountBalance:"Saldo akun",expense:"Pengeluaran",income:"Pemasukan",transfer:"Transfer",more:"Lainnya",transactions:"Transaksi",seeAll:"lihat semua",wallet:"Dompet",walletSub:"Kelola dompet dan tagihan.",monthlyBills:"Tagihan Bulanan",addBill:"+ Tagihan",monthIncome:"Pemasukan bulan ini",monthExpense:"Pengeluaran bulan ini",expenseByCategory:"Pengeluaran per Kategori",summary:"Ringkasan",totalBalance:"Total saldo",activeWallets:"Dompet aktif",theme:"Tema",themeSub:"Pilih satu dari 10 tema warna.",userData:"Profil Pribadi",language:"Bahasa",categories:"Kategori & Subkategori",categoriesSub:"Tambahkan subkategori agar input transaksi lebih cepat.",addSubcategory:"Tambah Subkategori",data:"Data",backup:"Backup Data",backupSub:"Simpan ke file JSON",restore:"Restore Data",restoreSub:"Kembalikan dari backup",demo:"Muat Data Demo",demoSub:"Lihat contoh tampilan",reset:"Reset Semua Data",resetSub:"Hapus data lokal aplikasi",home:"Home",analytics:"Analitik",setting:"Setting",amount:"Nominal",toWallet:"Ke Dompet",mainCategory:"Kategori Utama",subcategory:"Subkategori",date:"Tanggal",note:"Catatan",save:"Simpan",walletName:"Nama Dompet",openingBalance:"Saldo Awal",walletVisibility:"Visibilitas Dompet",billName:"Nama Tagihan",defaultAmount:"Nominal Default",dueDay:"Tanggal Jatuh Tempo",paymentHistory:"Riwayat Pembayaran",notifications:"Notifikasi",name:"Nama",type:"Jenis",addWallet:"Tambah Dompet",allTransactions:"Semua Transaksi"},
 en:{accountBalance:"Account balance",expense:"Expense",income:"Income",transfer:"Transfer",more:"More",transactions:"Transactions",seeAll:"see all",wallet:"Wallet",walletSub:"Manage wallets and bills.",monthlyBills:"Monthly Bills",addBill:"+ Bill",monthIncome:"Income this month",monthExpense:"Expense this month",expenseByCategory:"Expense by Category",summary:"Summary",totalBalance:"Total balance",activeWallets:"Active wallets",theme:"Theme",themeSub:"Choose one of 10 color themes.",userData:"User Data",language:"Language",categories:"Categories & Subcategories",categoriesSub:"Add subcategories for faster transaction input.",addSubcategory:"Add Subcategory",data:"Data",backup:"Backup Data",backupSub:"Save to JSON file",restore:"Restore Data",restoreSub:"Restore from backup",demo:"Load Demo Data",demoSub:"Preview sample data",reset:"Reset All Data",resetSub:"Delete local app data",home:"Home",analytics:"Analytics",setting:"Settings",amount:"Amount",toWallet:"To Wallet",mainCategory:"Main Category",subcategory:"Subcategory",date:"Date",note:"Note",save:"Save",walletName:"Wallet Name",openingBalance:"Opening Balance",walletVisibility:"Wallet Visibility",billName:"Bill Name",defaultAmount:"Default Amount",dueDay:"Due Date",paymentHistory:"Payment History",notifications:"Notifications",name:"Name",type:"Type",addWallet:"Add Wallet",allTransactions:"All Transactions"}};
 
+Object.assign(I18N.id,{
+ financeBills:"Tagihan",financeDebts:"Hutang / Cicilan",financeReceivables:"Piutang",financeType:"Jenis",financeDebtName:"Nama Hutang",financeTotalDebt:"Total Hutang",financeInstallmentCount:"Jumlah Cicilan",financeInstallmentAmount:"Cicilan per Pembayaran",financeDue:"Jatuh Tempo",financePaymentWallet:"Dompet Pembayaran",financePersonName:"Nama Orang",financeTotalReceivable:"Total Piutang",financeTargetPayment:"Target Pembayaran",financeReceivingWallet:"Dompet Penerima",financePayment:"Pembayaran",financePay:"Bayar",financeReceive:"Terima",financeDeletePayment:"Hapus pembayaran",financePaymentHistory:"Riwayat pembayaran"
+});
+Object.assign(I18N.en,{
+ financeBills:"Bills",financeDebts:"Debt / Installments",financeReceivables:"Receivables",financeType:"Type",financeDebtName:"Debt Name",financeTotalDebt:"Total Debt",financeInstallmentCount:"Installment Count",financeInstallmentAmount:"Amount per Installment",financeDue:"Due Date",financePaymentWallet:"Payment Wallet",financePersonName:"Person Name",financeTotalReceivable:"Total Receivable",financeTargetPayment:"Payment Target",financeReceivingWallet:"Receiving Wallet",financePayment:"Payment",financePay:"Pay",financeReceive:"Receive",financeDeletePayment:"Delete payment",financePaymentHistory:"Payment history"
+});
+
 let balanceVisible=true,currentTxDetailId=null;
-let lang=localStorage.getItem(LANG_KEY)||"id";
-let data=defaultData(),db=null,storageMode="indexeddb";
+let lang=localStorage.getItem(NOTED_LANG_KEY)||localStorage.getItem(LANG_KEY)||"id";
+let data=defaultData(),db=null,storageMode="indexeddb",lastPersistedData=null;
 
 function defaultCategories(){
 return{
@@ -973,7 +1453,7 @@ return{
   "Lainnya":["Umum"]
  }
 }}
-function defaultData(){return {wallets:[{id:1,name:"Dompet Utama",opening:0,hidden:false}],tx:[],bills:[],debts:[],receivables:[],categories:defaultCategories(),user:{name:"User",email:""},nextWallet:2,nextTx:1}}
+function defaultData(){return {schemaVersion:SCHEMA_VERSION,updatedAt:Date.now(),wallets:[{id:1,name:"Dompet Utama",opening:0,hidden:false}],tx:[],bills:[],debts:[],receivables:[],categories:defaultCategories(),user:{name:"User",email:""},nextWallet:2,nextTx:1}}
 function normalize(d){
  if(!d||typeof d!=="object")d=defaultData();
  if(!Array.isArray(d.wallets))d.wallets=[];
@@ -981,6 +1461,8 @@ function normalize(d){
  if(!Array.isArray(d.bills))d.bills=[];
  if(!Array.isArray(d.debts))d.debts=[];
  if(!Array.isArray(d.receivables))d.receivables=[];
+ d.schemaVersion=Number(d.schemaVersion)||1;
+ d.updatedAt=Number(d.updatedAt)||0;
 
  d.debts.forEach(item=>{
    item.total=Number(item.total)||0;
@@ -989,11 +1471,23 @@ function normalize(d){
    item.debtType=item.debtType|| (item.installmentCount>1?"INSTALLMENT":"DEBT");
    item.walletId=Number(item.walletId)||0;
    if(!Array.isArray(item.payments))item.payments=[];
+   item.payments.forEach((p,i)=>{
+     p.amount=Number(p.amount)||0;
+     p.principalApplied=Number(p.principalApplied!=null?p.principalApplied:p.amount)||0;
+     p.extraCharge=Number(p.extraCharge)||Math.max(0,p.amount-p.principalApplied);
+     if(!p.paymentId)p.paymentId=`legacy-debt-${item.id||"x"}-${i+1}`;
+     if(p.txId!=null)p.txId=Number(p.txId)||null;
+   });
  });
  d.receivables.forEach(item=>{
    item.total=Number(item.total)||0;
    item.walletId=Number(item.walletId)||0;
    if(!Array.isArray(item.payments))item.payments=[];
+   item.payments.forEach((p,i)=>{
+     p.amount=Number(p.amount)||0;
+     if(!p.paymentId)p.paymentId=`legacy-receivable-${item.id||"x"}-${i+1}`;
+     if(p.txId!=null)p.txId=Number(p.txId)||null;
+   });
  });
 
 
@@ -1030,6 +1524,9 @@ function normalize(d){
    if(!t.category)t.category=t.mainCategory;
    if(!t.subcategory)t.subcategory="";
    if(!t.date)t.date=today();
+   if(t.sourceType)t.sourceType=String(t.sourceType).toUpperCase();
+   if(t.sourceId!=null)t.sourceId=String(t.sourceId);
+   if(t.paymentId!=null)t.paymentId=String(t.paymentId);
  });
  d.bills.forEach(b=>{
    b.walletId=Number(b.walletId)||0;
@@ -1039,6 +1536,11 @@ function normalize(d){
    if(!b.category)b.category=b.mainCategory;
    if(!b.subcategory)b.subcategory="";
    if(!Array.isArray(b.history))b.history=[];
+   b.history.forEach((h,i)=>{
+     h.amount=Number(h.amount)||0;
+     if(!h.paymentId)h.paymentId=`legacy-bill-${b.id||"x"}-${i+1}`;
+     if(h.txId!=null)h.txId=Number(h.txId)||null;
+   });
    if(b.payments&&typeof b.payments==="object"){
      Object.entries(b.payments).forEach(([month,p])=>{
        const txId=Number(p?.txId)||null;
@@ -1049,6 +1551,21 @@ function normalize(d){
      });
    }
  });
+
+ // Hubungkan histori finance lama ke transaksi bila txId sudah tersedia.
+ d.bills.forEach(b=>(b.history||[]).forEach(h=>{
+   const t=h.txId?d.tx.find(x=>Number(x.id)===Number(h.txId)):null;
+   if(t){t.sourceType="BILL";t.sourceId=String(b.id);t.paymentId=String(h.paymentId);}
+ }));
+ d.debts.forEach(item=>(item.payments||[]).forEach(p=>{
+   const t=p.txId?d.tx.find(x=>Number(x.id)===Number(p.txId)):null;
+   if(t){t.sourceType="DEBT";t.sourceId=String(item.id);t.paymentId=String(p.paymentId);}
+ }));
+ d.receivables.forEach(item=>(item.payments||[]).forEach(p=>{
+   const t=p.txId?d.tx.find(x=>Number(x.id)===Number(p.txId)):null;
+   if(t){t.sourceType="RECEIVABLE";t.sourceId=String(item.id);t.paymentId=String(p.paymentId);}
+ }));
+ d.schemaVersion=SCHEMA_VERSION;
 
  // Jangan percaya next id lama kalau lebih kecil dari data yang sudah ada.
  const maxWallet=Math.max(0,...d.wallets.map(w=>Number(w.id)||0));
@@ -1087,7 +1604,7 @@ function idbSet(key,value){
  });
 }
 function readLegacyData(){
- for(const key of LEGACY_KEYS){
+ for(const key of [NOTED_FALLBACK_KEY,...LEGACY_KEYS]){
    try{
      const raw=localStorage.getItem(key);
      if(!raw)continue;
@@ -1098,43 +1615,59 @@ function readLegacyData(){
  return null;
 }
 async function initStorage(){
+ const fallback=readLegacyData();
  try{
    db=await openDB();
    const stored=await idbGet(STATE_KEY);
-   if(stored&&Array.isArray(stored.wallets)&&Array.isArray(stored.tx)){
-     data=normalize(stored);
+   const hasStored=stored&&Array.isArray(stored.wallets)&&Array.isArray(stored.tx);
+   const hasFallback=fallback&&Array.isArray(fallback.wallets)&&Array.isArray(fallback.tx);
+   if(hasStored||hasFallback){
+     const idbData=hasStored?normalize(stored):null;
+     const fallbackData=hasFallback?normalize(fallback):null;
+     data=(!idbData||(fallbackData&&Number(fallbackData.updatedAt||0)>Number(idbData.updatedAt||0)))?fallbackData:idbData;
+     data=normalize(data||defaultData());
      await idbSet(STATE_KEY,data);
-     return;
-   }
-   const legacy=readLegacyData();
-   if(legacy){
-     data=normalize(legacy);
-     await idbSet(STATE_KEY,data);
+     lastPersistedData=structuredCloneSafe(data);
      return;
    }
    data=defaultData();
    await idbSet(STATE_KEY,data);
+   lastPersistedData=structuredCloneSafe(data);
  }catch(e){
+   console.error("initStorage:",e);
    storageMode="localstorage";
-   data=normalize(readLegacyData()||defaultData());
+   db=null;
+   data=normalize(fallback||defaultData());
+   lastPersistedData=structuredCloneSafe(data);
  }
 }
 async function persistData(){
+  data=normalize(data);
+  data.updatedAt=Date.now();
+  const candidate=structuredCloneSafe(data);
   try{
-    data=normalize(data);
     if(storageMode==="indexeddb"&&db){
-      await idbSet(STATE_KEY,data);
+      await idbSet(STATE_KEY,candidate);
     }else{
-      localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data));
+      localStorage.setItem(NOTED_FALLBACK_KEY,JSON.stringify(candidate));
+      // Pertahankan key lama agar downgrade/versi lama masih dapat membaca data.
+      localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(candidate));
     }
+    lastPersistedData=structuredCloneSafe(candidate);
     return true;
   }catch(e){
-    console.error("persistData:",e);
+    console.error("persistData primary:",e);
     try{
-      localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data));
+      localStorage.setItem(NOTED_FALLBACK_KEY,JSON.stringify(candidate));
+      localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(candidate));
+      storageMode="localstorage";
+      db=null;
+      lastPersistedData=structuredCloneSafe(candidate);
       return true;
     }catch(fallbackError){
-      console.error("fallback persist:",fallbackError);
+      console.error("persistData fallback:",fallbackError);
+      if(lastPersistedData)data=structuredCloneSafe(lastPersistedData);
+      safeRenderAll();
       return false;
     }
   }
@@ -1146,6 +1679,9 @@ async function save(){
   return ok;
 }
 
+function structuredCloneSafe(value){
+  try{return structuredClone(value)}catch(_){return JSON.parse(JSON.stringify(value))}
+}
 function tr(k){return I18N[lang]?.[k]||I18N.id[k]||k}
 function applyLanguage(){
  document.documentElement.lang=lang;
@@ -1154,7 +1690,7 @@ function applyLanguage(){
  $("langEnMark").textContent=lang==="en"?"✓":"";
  renderAll()
 }
-function setLanguage(v){lang=v;localStorage.setItem(LANG_KEY,v);applyLanguage()}
+function setLanguage(v){lang=v;localStorage.setItem(NOTED_LANG_KEY,v);localStorage.setItem(LANG_KEY,v);applyLanguage()}
 function rp(n){return fmt.format(Number(n)||0)}
 function showToast(msg){
  const el=$("toast");if(!el)return;
@@ -1163,18 +1699,21 @@ function showToast(msg){
  window.__toastTimer=setTimeout(()=>el.classList.remove("show"),1600);
 }
 function money(v){return Number(String(v||"").replace(/\D/g,""))||0}
-function today(){return new Date().toISOString().slice(0,10)}
+function today(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
 function mk(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`}
 function formatDate(s){if(!s)return"-";const d=new Date(s+"T00:00:00");return d.toLocaleDateString(lang==="en"?"en-US":"id-ID",{day:"numeric",month:"short",year:"numeric"})}
 function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-["txAmount","walletOpening","billAmount","debtTotal","debtInstallment","receivableTotal"].forEach(id=>$(id).addEventListener("input",e=>{const n=money(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}));
+["txAmount","walletOpening","billAmount","debtTotal","debtInstallment","receivableTotal","financePaymentAmount"].forEach(id=>{const el=$(id);if(el)el.addEventListener("input",e=>{const n=money(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""})});
 $("debtTotal").addEventListener("blur",recalcDebtInstallment);
 $("debtInstallmentCount").addEventListener("change",recalcDebtInstallment);
 function go(id){
+ if(!["home","wallet","analytics","setting"].includes(id))id="home";
+ if(id!=="wallet")closeFinancePage();
+ saveLastPage(id);
  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.nav===id));
  $("backBtn").classList.toggle("hidden",id==="home");
- window.scrollTo({top:0,behavior:"smooth"})
+ window.scrollTo({top:0,behavior:"smooth"});
 }
 
 
@@ -1252,7 +1791,7 @@ document.addEventListener("focusout",e=>{
   if(!modal)return;
   setTimeout(()=>{
     const active=document.activeElement;
-    if((!active || !modal.contains(active)) && !["subcategoryModal","userModal"].includes(modal.id)){
+    if((!active || !modal.contains(active)) && !["subcategoryModal","userModal","walletModal"].includes(modal.id)){
       modal.classList.remove("keyboard-up");
     }
   },180);
@@ -1278,6 +1817,23 @@ document.addEventListener("focusin",e=>{
     modal.classList.add("keyboard-up");
     setTimeout(()=>{
       try{e.target.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}
+    },180);
+  }
+});
+
+
+document.addEventListener("focusin",e=>{
+  if(!e.target || !["walletName","walletOpening"].includes(e.target.id))return;
+  const modal=$("walletModal");
+
+  if(modal && modal.classList.contains("show")){
+    modal.classList.add("keyboard-up");
+
+    setTimeout(()=>{
+      if(!modal.classList.contains("show"))return;
+      try{
+        e.target.scrollIntoView({block:"center",behavior:"smooth"});
+      }catch(_){}
     },180);
   }
 });
@@ -1452,6 +2008,10 @@ async function saveTx(){
  const walletId=Number($("txWallet").value)||0;
  const toWalletId=Number($("txTo").value)||0;
  const type=String($("txLockedType").value||"EXPENSE").toUpperCase();
+ const existingTx=editId?data.tx.find(t=>Number(t.id)===editId):null;
+ if(existingTx?.sourceType){
+   return alert(lang==="en"?"Finance-linked transactions must be changed from their Bill/Debt/Receivable module.":"Transaksi yang terhubung ke Tagihan/Hutang/Piutang harus diubah dari modul asalnya.");
+ }
 
  if(amount<=0)return alert(lang==="en"?"Enter a valid amount.":"Nominal belum benar.");
  if(!walletId||!data.wallets.some(w=>w.id===walletId))
@@ -1487,30 +2047,17 @@ async function saveTx(){
    data.tx.push(tx);
  }
 
- // Tutup popup segera setelah validasi dan data masuk memory.
- closeQuickTransactionModal();
-
- try{
-   if(storageMode==="indexeddb"&&db){
-     await idbSet(STATE_KEY,data);
-   }else{
-     localStorage.setItem(LEGACY_KEYS[0],JSON.stringify(data));
-   }
-
-   // Render setelah popup benar-benar ditutup.
-   try{renderAll()}catch(renderError){console.error("Render error:",renderError)}
-
-   showToast(
-     type==="EXPENSE"?(lang==="en"?"Expense saved":"Pengeluaran tersimpan"):
-     type==="INCOME"?(lang==="en"?"Income saved":"Pemasukan tersimpan"):
-     (lang==="en"?"Transfer saved":"Transfer tersimpan")
-   );
- }catch(e){
-   console.error(e);
-   alert(lang==="en"
-     ?"Transaction was added but storage failed. Please backup your data."
-     :"Transaksi sudah ditambahkan, tetapi penyimpanan gagal. Segera backup data.");
+ const ok=await persistData();
+ if(!ok){
+   return alert(lang==="en"?"Failed to save transaction. No changes were committed.":"Gagal menyimpan transaksi. Perubahan dibatalkan.");
  }
+ closeQuickTransactionModal();
+ safeRenderAll();
+ showToast(
+   type==="EXPENSE"?(lang==="en"?"Expense saved":"Pengeluaran tersimpan"):
+   type==="INCOME"?(lang==="en"?"Income saved":"Pemasukan tersimpan"):
+   (lang==="en"?"Transfer saved":"Transfer tersimpan")
+ );
 }
 function openTxDetail(id){
  const t=data.tx.find(x=>x.id===id);if(!t||!txIsVisible(t))return;currentTxDetailId=id;
@@ -1524,8 +2071,17 @@ function openTxDetail(id){
  </div><div class="detail-note"><b>${tr("note")}</b><br>${esc(t.note||"-")}</div>`;
  openModal("txDetailModal")
 }
-function editCurrentTx(){const t=data.tx.find(x=>x.id===currentTxDetailId);if(!t)return;closeModal("txDetailModal");openTx(t.type,true,t.id)}
-function deleteTx(){const id=+$("txId").value;if(confirm(lang==="en"?"Delete this transaction?":"Hapus transaksi ini?")){data.tx=data.tx.filter(t=>t.id!==id);closeQuickTransactionModal();save()}}
+function editCurrentTx(){const t=data.tx.find(x=>x.id===currentTxDetailId);if(!t)return;if(t.sourceType)return alert(lang==="en"?"Edit this payment from its finance module.":"Edit pembayaran ini dari modul Tagihan/Hutang/Piutang asalnya.");closeModal("txDetailModal");openTx(t.type,true,t.id)}
+async function deleteTx(){
+ const id=+$("txId").value;
+ const t=data.tx.find(x=>Number(x.id)===id);if(!t)return;
+ if(t.sourceType)return alert(lang==="en"?"Delete this payment from its finance module.":"Hapus pembayaran ini dari modul Tagihan/Hutang/Piutang asalnya.");
+ if(!confirm(lang==="en"?"Delete this transaction?":"Hapus transaksi ini?"))return;
+ data.tx=data.tx.filter(x=>Number(x.id)!==id);
+ const ok=await persistData();
+ if(!ok)return alert(lang==="en"?"Failed to delete transaction.":"Gagal menghapus transaksi.");
+ closeQuickTransactionModal();safeRenderAll();showToast(lang==="en"?"Transaction deleted":"Transaksi dihapus");
+}
 function walletEyeSvg(hidden){
  if(hidden){
    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -1548,22 +2104,108 @@ function toggleWalletHidden(id,event){
  save();
 }
 
-let walletFinanceTab="bills";
+
+const LAST_PAGE_KEY="noted_last_page";
+
+const LAST_FINANCE_PAGE_OPEN_KEY="noted_finance_page_open";
+
+function saveFinanceOpenState(type){
+  try{
+    if(type)localStorage.setItem(LAST_FINANCE_PAGE_OPEN_KEY,type);
+    else localStorage.removeItem(LAST_FINANCE_PAGE_OPEN_KEY);
+  }catch(e){}
+}
+function loadFinanceOpenState(){
+  try{
+    const v=localStorage.getItem(LAST_FINANCE_PAGE_OPEN_KEY);
+    return ["bills","debts","receivables"].includes(v)?v:null;
+  }catch(e){
+    return null;
+  }
+}
+
+const LAST_WALLET_TAB_KEY="noted_last_wallet_finance_tab";
+
+function saveLastPage(page){
+  try{localStorage.setItem(LAST_PAGE_KEY,page)}catch(e){}
+}
+function loadLastPage(){
+  try{
+    const p=localStorage.getItem(LAST_PAGE_KEY);
+    return ["home","wallet","analytics","setting"].includes(p)?p:"home";
+  }catch(e){
+    return "home";
+  }
+}
+function saveLastWalletTab(tab){
+  try{localStorage.setItem(LAST_WALLET_TAB_KEY,tab)}catch(e){}
+}
+function loadLastWalletTab(){
+  try{
+    const t=localStorage.getItem(LAST_WALLET_TAB_KEY);
+    return ["bills","debts","receivables"].includes(t)?t:"bills";
+  }catch(e){
+    return "bills";
+  }
+}
+
+
+let activeFinancePage=null;
+
+function openFinancePage(type){
+  if(!["bills","debts","receivables"].includes(type))return;
+
+  closeFinancePage(false);
+  activeFinancePage=type;
+  saveFinanceOpenState(type);
+  walletFinanceTab=type;
+  saveLastWalletTab(type);
+
+  const map={
+    bills:"financePageBills",
+    debts:"financePageDebts",
+    receivables:"financePageReceivables"
+  };
+  const el=$(map[type]);
+  if(el)el.classList.add("show");
+
+  document.body.classList.add("finance-page-open");
+  renderWalletFinanceTables();
+}
+
+function closeFinancePage(reset=true){
+  ["financePageBills","financePageDebts","financePageReceivables"].forEach(id=>{
+    const el=$(id);
+    if(el)el.classList.remove("show");
+  });
+  document.body.classList.remove("finance-page-open");
+  if(reset){activeFinancePage=null;saveFinanceOpenState(null);}
+}
+
+function renderFinanceLaunchSummaries(){
+  const visibleWalletSet=new Set(data.wallets.filter(w=>!w.hidden).map(w=>Number(w.id)));
+
+  const bills=(data.bills||[]).filter(b=>visibleWalletSet.has(Number(b.walletId)));
+  const debts=(data.debts||[]).filter(d=>visibleWalletSet.has(Number(d.walletId)));
+  const receivables=(data.receivables||[]).filter(r=>visibleWalletSet.has(Number(r.walletId)));
+
+  const billEl=$("billLaunchSummary");
+  const debtEl=$("debtLaunchSummary");
+  const recEl=$("receivableLaunchSummary");
+
+  if(billEl)billEl.textContent=bills.length?`${bills.length} tagihan aktif`:"Belum ada tagihan";
+  if(debtEl)debtEl.textContent=debts.length?`${debts.length} hutang/cicilan`:"Belum ada hutang/cicilan";
+  if(recEl)recEl.textContent=receivables.length?`${receivables.length} piutang`:"Belum ada piutang";
+}
+
+let walletFinanceTab=loadLastWalletTab();
 
 function switchWalletFinanceTab(tab){
-  if(!["bills","debts","receivables"].includes(tab))tab="bills";
   walletFinanceTab=tab;
-
-  document.querySelectorAll(".wallet-fin-tab").forEach(btn=>{
-    btn.classList.toggle("active",btn.dataset.finTab===tab);
-  });
-
-  const bills=$("walletFinanceBills");
-  const debts=$("walletFinanceDebts");
-  const rec=$("walletFinanceReceivables");
-  if(bills)bills.classList.toggle("active",tab==="bills");
-  if(debts)debts.classList.toggle("active",tab==="debts");
-  if(rec)rec.classList.toggle("active",tab==="receivables");
+  saveLastWalletTab(tab);
+  if(activeFinancePage){
+    openFinancePage(tab);
+  }
 }
 
 function populateFinanceWalletSelect(selectId){
@@ -1714,7 +2356,7 @@ function renderDebtTable(){
     .filter(d=>visibleWalletSet.has(Number(d.walletId)));
 
   if(!list.length){
-    target.innerHTML=`<div class="empty">Belum ada hutang atau cicilan.</div>`;
+    target.innerHTML=`<div class="empty">${lang==="en"?"No debt or installments yet.":"Belum ada hutang atau cicilan."}</div>`;
     return;
   }
 
@@ -1723,10 +2365,10 @@ function renderDebtTable(){
       <table class="finance-table debt-compact-table">
         <thead>
           <tr>
-            <th>Nama</th>
-            <th>Tempo</th>
+            <th>${lang==="en"?"Name":"Nama"}</th>
+            <th>${lang==="en"?"Due":"Tempo"}</th>
             <th>Progress</th>
-            <th>Aksi</th>
+            <th>${lang==="en"?"Action":"Aksi"}</th>
           </tr>
         </thead>
         <tbody>
@@ -1830,9 +2472,10 @@ function openDebtDetail(id){
     </div>
     ${d.note?`
       <div class="debt-detail-note">
-        <div class="debt-detail-label">Catatan</div>
+        <div class="debt-detail-label">${lang==="en"?"Note":"Catatan"}</div>
         <div class="debt-detail-value">${esc(d.note)}</div>
       </div>`:""}
+    ${(d.payments||[]).length?`<div class="debt-detail-note"><div class="debt-detail-label">${lang==="en"?"Payment history":"Riwayat pembayaran"}</div>${[...(d.payments||[])].reverse().map(p=>`<div class="history-item"><b>${rp(p.amount)}</b> · ${formatDate(p.date)}${p.paymentId?`<div style="margin-top:6px"><button class="finance-mini-btn" onclick="deleteFinancePayment('DEBT','${String(d.id).replace(/'/g,"\'")}','${String(p.paymentId).replace(/'/g,"\'")}')">${lang==="en"?"Delete payment":"Hapus pembayaran"}</button></div>`:""}</div>`).join("")}</div>`:""}
   `;
 
   $("debtDetailEditBtn").onclick=()=>{
@@ -1891,7 +2534,7 @@ function renderReceivableTable(){
     .filter(r=>visibleWalletSet.has(Number(r.walletId)));
 
   if(!list.length){
-    target.innerHTML=`<div class="empty">Belum ada piutang.</div>`;
+    target.innerHTML=`<div class="empty">${lang==="en"?"No receivables yet.":"Belum ada piutang."}</div>`;
     return;
   }
 
@@ -1899,7 +2542,7 @@ function renderReceivableTable(){
     <div class="finance-table-wrap">
       <table class="finance-table receivable-compact-table">
         <thead>
-          <tr><th>Nama</th><th>Target</th><th>Status</th><th>Aksi</th></tr>
+          <tr><th>${lang==="en"?"Name":"Nama"}</th><th>Target</th><th>Status</th><th>${lang==="en"?"Action":"Aksi"}</th></tr>
         </thead>
         <tbody>
           ${list.map(r=>{
@@ -1914,13 +2557,13 @@ function renderReceivableTable(){
               <td>${formatDate(r.dueDate)}</td>
               <td>
                 <span class="finance-status ${isDone?"done":"warn"}">
-                  ${isDone?"Lunas":"Belum"}
+                  ${isDone?(lang==="en"?"Paid":"Lunas"):(lang==="en"?"Pending":"Belum")}
                 </span>
               </td>
               <td>
                 ${isDone
-                  ? `<span class="finance-status done">Terbayar</span>`
-                  : `<button type="button" class="finance-mini-btn primary" onclick="receiveReceivable('${r.id}')">Terima</button>`}
+                  ? `<span class="finance-status done">${lang==="en"?"Paid":"Terbayar"}</span>`
+                  : `<button type="button" class="finance-mini-btn primary" onclick="receiveReceivable('${r.id}')">${lang==="en"?"Receive":"Terima"}</button>`}
               </td>
             </tr>`;
           }).join("")}
@@ -1966,9 +2609,10 @@ function openReceivableDetail(id){
     </div>
     ${r.note?`
       <div class="debt-detail-note">
-        <div class="debt-detail-label">Catatan</div>
+        <div class="debt-detail-label">${lang==="en"?"Note":"Catatan"}</div>
         <div class="debt-detail-value">${esc(r.note)}</div>
       </div>`:""}
+    ${(r.payments||[]).length?`<div class="debt-detail-note"><div class="debt-detail-label">${lang==="en"?"Payment history":"Riwayat pembayaran"}</div>${[...(r.payments||[])].reverse().map(p=>`<div class="history-item"><b>${rp(p.amount)}</b> · ${formatDate(p.date)}${p.paymentId?`<div style="margin-top:6px"><button class="finance-mini-btn" onclick="deleteFinancePayment('RECEIVABLE','${String(r.id).replace(/'/g,"\'")}','${String(p.paymentId).replace(/'/g,"\'")}')">${lang==="en"?"Delete payment":"Hapus pembayaran"}</button></div>`:""}</div>`).join("")}</div>`:""}
   `;
 
   $("receivableDetailEditBtn").onclick=()=>{
@@ -2017,6 +2661,8 @@ function renderWalletFinanceTables(){
       recEl.innerHTML=`<div class="empty">Gagal memuat Piutang.</div>`;
     }
   }
+
+  renderFinanceLaunchSummaries();
 }
 
 function openDebtModal(id=null){
@@ -2029,7 +2675,7 @@ function openDebtModal(id=null){
   }
 
   $("debtId").value="";
-  $("debtModalTitle").textContent=id?"Edit Hutang / Cicilan":"Tambah Hutang / Cicilan";
+  $("debtModalTitle").textContent=id?(lang==="en"?"Edit Debt / Installments":"Edit Hutang / Cicilan"):(lang==="en"?"Add Debt / Installments":"Tambah Hutang / Cicilan");
   $("debtType").value="INSTALLMENT";
   $("debtName").value="";
   $("debtTotal").value="";
@@ -2083,10 +2729,11 @@ async function saveDebt(){
   if(!name)return alert("Nama hutang harus diisi.");
   if(total<=0)return alert("Total hutang harus lebih dari 0.");
   if(!walletId||!data.wallets.some(w=>w.id===walletId))return alert("Pilih dompet pembayaran.");
-  if(debtType==="INSTALLMENT"&&installmentCount<1)return alert("Jumlah cicilan tidak valid.");
-  if(installment<=0)installment=Math.ceil(total/installmentCount);
-
+  if(debtType==="INSTALLMENT"&&installmentCount<1)return alert(lang==="en"?"Invalid installment count.":"Jumlah cicilan tidak valid.");
   const existing=id?data.debts.find(x=>String(x.id)===String(id)):null;
+  const alreadyPaid=existing?debtPaidAmount(existing):0;
+  if(total<alreadyPaid)return alert(lang==="en"?`Debt total cannot be below already paid principal (${rp(alreadyPaid)}).`:`Total hutang tidak boleh lebih kecil dari pokok yang sudah dibayar (${rp(alreadyPaid)}).`);
+  if(installment<=0)installment=Math.ceil(total/installmentCount);
 
   const obj={
     id:id||"d"+Date.now(),
@@ -2126,6 +2773,7 @@ async function deleteDebt(){
   if(!confirm("Hapus hutang/cicilan ini?"))return;
 
   data.debts=data.debts.filter(x=>String(x.id)!==String(id));
+  data.tx=data.tx.filter(t=>!(t.sourceType==="DEBT"&&String(t.sourceId)===String(id)));
   const ok=await persistData();
   if(!ok){
     alert("Gagal menghapus hutang.");
@@ -2136,82 +2784,60 @@ async function deleteDebt(){
   switchWalletFinanceTab("debts");
   showToast("Hutang dihapus");
 }
+let pendingFinancePayment=null;
+function openFinancePayment(type,id,suggested,hint=""){
+  pendingFinancePayment={type:String(type).toUpperCase(),id:String(id)};
+  $("financePaymentType").value=pendingFinancePayment.type;
+  $("financePaymentSourceId").value=pendingFinancePayment.id;
+  $("financePaymentAmount").value=Number(suggested||0).toLocaleString("id-ID");
+  $("financePaymentTitle").textContent=pendingFinancePayment.type==="BILL"?(lang==="en"?"Pay Bill":"Bayar Tagihan"):pendingFinancePayment.type==="DEBT"?(lang==="en"?"Pay Debt / Installment":"Bayar Hutang / Cicilan"):(lang==="en"?"Receive Receivable":"Terima Piutang");
+  $("financePaymentLabel").textContent=lang==="en"?"Amount":"Nominal";
+  $("financePaymentHint").textContent=hint||"";
+  openModal("financePaymentModal");
+  setTimeout(()=>$("financePaymentAmount")?.focus(),0);
+}
+async function submitFinancePayment(){
+  const type=$("financePaymentType").value;
+  const id=$("financePaymentSourceId").value;
+  const amount=money($("financePaymentAmount").value);
+  if(amount<=0)return alert(lang==="en"?"Enter a valid amount.":"Nominal harus lebih dari 0.");
+  closeModal("financePaymentModal");
+  if(type==="BILL")return commitBillPayment(id,amount);
+  if(type==="DEBT")return commitDebtPayment(id,amount);
+  if(type==="RECEIVABLE")return commitReceivablePayment(id,amount);
+}
+function newPaymentId(prefix){return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`}
+
 async function payDebt(id){
-  const d=data.debts.find(x=>String(x.id)===String(id));
-  if(!d)return;
-
+  const d=data.debts.find(x=>String(x.id)===String(id));if(!d)return;
   const remaining=debtRemaining(d);
-  if(remaining<=0){
-    alert("Hutang ini sudah lunas.");
-    return;
-  }
-
+  if(remaining<=0)return alert(lang==="en"?"This debt is already paid.":"Hutang ini sudah lunas.");
   const totalInstallments=Number(d.installmentCount)||1;
   const paidInstallments=debtPaidInstallments(d);
-
-  if(d.debtType==="INSTALLMENT" && paidInstallments>=totalInstallments){
-    alert("Semua cicilan sudah tercatat.");
-    return;
-  }
-
+  if(d.debtType==="INSTALLMENT"&&paidInstallments>=totalInstallments)return alert(lang==="en"?"All installments are recorded.":"Semua cicilan sudah tercatat.");
   const suggested=Math.min(Number(d.installment)||remaining,remaining);
-
-  const raw=prompt(
-    d.debtType==="INSTALLMENT"
-      ? `Masukkan nominal pembayaran cicilan ke-${paidInstallments+1} dari ${totalInstallments}.\nBoleh diubah manual jika ada bunga/biaya tambahan:`
-      : "Masukkan nominal pembayaran hutang:",
-    suggested.toLocaleString("id-ID")
-  );
-  if(raw===null)return;
-
-  const amount=money(raw);
-  if(amount<=0){
-    alert("Nominal pembayaran harus lebih dari 0.");
-    return;
-  }
-
-  // Untuk cicilan berbunga, pembayaran boleh lebih besar dari sisa pokok.
-  // Namun sisa pokok tetap tidak boleh menjadi negatif.
+  const hint=d.debtType==="INSTALLMENT"
+    ? `${lang==="en"?"Installment":"Cicilan"} ${paidInstallments+1}/${totalInstallments} · ${lang==="en"?"remaining principal":"sisa pokok"} ${rp(remaining)}`
+    : `${lang==="en"?"Remaining debt":"Sisa hutang"}: ${rp(remaining)}`;
+  openFinancePayment("DEBT",id,suggested,hint);
+}
+async function commitDebtPayment(id,amount){
+  const d=data.debts.find(x=>String(x.id)===String(id));if(!d)return;
+  const remaining=debtRemaining(d);if(remaining<=0)return;
+  const totalInstallments=Number(d.installmentCount)||1;
+  const paidInstallments=debtPaidInstallments(d);
   const principalApplied=Math.min(amount,remaining);
   const extraCharge=Math.max(0,amount-principalApplied);
-
-  d.payments=d.payments||[];
-  d.payments.push({
-    amount,
-    principalApplied,
-    extraCharge,
-    date:today(),
-    installmentNo:d.debtType==="INSTALLMENT"?paidInstallments+1:1
-  });
-
-  data.tx.push({
-    id:data.nextTx++,
-    type:"EXPENSE",
-    amount,
-    walletId:Number(d.walletId),
-    date:today(),
-    note:d.debtType==="INSTALLMENT"
-      ? `Cicilan ${paidInstallments+1}/${totalInstallments} · ${d.name}${extraCharge>0?` · bunga/biaya ${rp(extraCharge)}`:""}`
-      : `Bayar hutang · ${d.name}`,
-    mainCategory:"Tagihan",
-    subcategory:"Cicilan",
-    category:"Tagihan"
-  });
-
-  const ok=await persistData();
-  if(!ok){
-    alert("Gagal menyimpan pembayaran.");
-    return;
-  }
-  safeRenderAll();
-  switchWalletFinanceTab("debts");
-  showToast(
-      d.debtType==="INSTALLMENT"
-        ? `Pembayaran tersimpan · ${debtInstallmentsRemaining(d)}/${totalInstallments} tersisa`
-        : "Pembayaran hutang tersimpan"
-    );
+  const paymentId=newPaymentId("debt");
+  const txId=data.nextTx++;
+  const payment={paymentId,txId,amount,principalApplied,extraCharge,date:today(),installmentNo:d.debtType==="INSTALLMENT"?paidInstallments+1:1};
+  d.payments=d.payments||[];d.payments.push(payment);
+  data.tx.push({id:txId,type:"EXPENSE",amount,walletId:Number(d.walletId),date:payment.date,
+    note:d.debtType==="INSTALLMENT"?`Cicilan ${paidInstallments+1}/${totalInstallments} · ${d.name}${extraCharge>0?` · bunga/biaya ${rp(extraCharge)}`:""}`:`Bayar hutang · ${d.name}`,
+    mainCategory:"Tagihan",subcategory:"Cicilan",category:"Tagihan",sourceType:"DEBT",sourceId:String(d.id),paymentId});
+  const ok=await persistData();if(!ok)return alert(lang==="en"?"Failed to save payment.":"Gagal menyimpan pembayaran.");
+  safeRenderAll();switchWalletFinanceTab("debts");showToast(lang==="en"?"Payment saved":"Pembayaran hutang tersimpan");
 }
-
 function openReceivableModal(id=null){
   populateFinanceWalletSelect("receivableWallet");
   const visible=data.wallets.filter(w=>!w.hidden);
@@ -2222,7 +2848,7 @@ function openReceivableModal(id=null){
   }
 
   $("receivableId").value="";
-  $("receivableModalTitle").textContent=id?"Edit Piutang":"Tambah Piutang";
+  $("receivableModalTitle").textContent=id?(lang==="en"?"Edit Receivable":"Edit Piutang"):(lang==="en"?"Add Receivable":"Tambah Piutang");
   $("receivableName").value="";
   $("receivableTotal").value="";
   $("receivableDueDate").value=today();
@@ -2261,9 +2887,11 @@ async function saveReceivable(){
 
   if(!name)return alert("Nama orang harus diisi.");
   if(total<=0)return alert("Total piutang harus lebih dari 0.");
-  if(!walletId||!data.wallets.some(w=>w.id===walletId))return alert("Pilih dompet penerima.");
+  if(!walletId||!data.wallets.some(w=>w.id===walletId))return alert(lang==="en"?"Choose receiving wallet.":"Pilih dompet penerima.");
 
   const existing=id?data.receivables.find(x=>String(x.id)===String(id)):null;
+  const alreadyPaid=existing?receivablePaidAmount(existing):0;
+  if(total<alreadyPaid)return alert(lang==="en"?`Receivable total cannot be below amount already received (${rp(alreadyPaid)}).`:`Total piutang tidak boleh lebih kecil dari pembayaran yang sudah diterima (${rp(alreadyPaid)}).`);
   const obj={
     id:id||"r"+Date.now(),
     name,
@@ -2298,6 +2926,7 @@ async function deleteReceivable(){
   if(!confirm("Hapus piutang ini?"))return;
 
   data.receivables=data.receivables.filter(x=>String(x.id)!==String(id));
+  data.tx=data.tx.filter(t=>!(t.sourceType==="RECEIVABLE"&&String(t.sourceId)===String(id)));
   const ok=await persistData();
   if(!ok){
     alert("Gagal menghapus piutang.");
@@ -2310,48 +2939,45 @@ async function deleteReceivable(){
 }
 
 async function receiveReceivable(id){
-  const r=data.receivables.find(x=>String(x.id)===String(id));
-  if(!r)return;
-
+  const r=data.receivables.find(x=>String(x.id)===String(id));if(!r)return;
   const remaining=receivableRemaining(r);
-  if(remaining<=0){
-    alert("Piutang ini sudah lunas.");
-    return;
-  }
-
-  const raw=prompt("Nominal diterima:",remaining.toLocaleString("id-ID"));
-  if(raw===null)return;
-
-  const amount=money(raw);
-  if(amount<=0)return;
-
+  if(remaining<=0)return alert(lang==="en"?"This receivable is already paid.":"Piutang ini sudah lunas.");
+  openFinancePayment("RECEIVABLE",id,remaining,`${lang==="en"?"Remaining receivable":"Sisa piutang"}: ${rp(remaining)}`);
+}
+async function commitReceivablePayment(id,amount){
+  const r=data.receivables.find(x=>String(x.id)===String(id));if(!r)return;
+  const remaining=receivableRemaining(r);if(remaining<=0)return;
   const applied=Math.min(amount,remaining);
-  r.payments=r.payments||[];
-  r.payments.push({amount:applied,date:today()});
-
-  data.tx.push({
-    id:data.nextTx++,
-    type:"INCOME",
-    amount,
-    walletId:Number(r.walletId),
-    date:today(),
-    note:"Pembayaran piutang "+r.name,
-    mainCategory:"Lainnya",
-    subcategory:"Piutang",
-    category:"Lainnya"
-  });
-
-  const ok=await persistData();
-  if(!ok){
-    alert("Gagal menyimpan pembayaran piutang.");
-    return;
-  }
-
-  safeRenderAll();
-  switchWalletFinanceTab("receivables");
-  showToast("Pembayaran piutang tersimpan");
+  if(amount>remaining)showToast(lang==="en"?`Only ${rp(applied)} applied to receivable`:`Hanya ${rp(applied)} diterapkan ke piutang`);
+  const paymentId=newPaymentId("receivable");
+  const txId=data.nextTx++;
+  const payment={paymentId,txId,amount:applied,date:today()};
+  r.payments=r.payments||[];r.payments.push(payment);
+  data.tx.push({id:txId,type:"INCOME",amount:applied,walletId:Number(r.walletId),date:payment.date,note:"Pembayaran piutang "+r.name,
+    mainCategory:"Lainnya",subcategory:"Piutang",category:"Lainnya",sourceType:"RECEIVABLE",sourceId:String(r.id),paymentId});
+  const ok=await persistData();if(!ok)return alert(lang==="en"?"Failed to save receivable payment.":"Gagal menyimpan pembayaran piutang.");
+  safeRenderAll();switchWalletFinanceTab("receivables");showToast(lang==="en"?"Receivable payment saved":"Pembayaran piutang tersimpan");
 }
 
+async function deleteFinancePayment(sourceType,sourceId,paymentId){
+  const type=String(sourceType||"").toUpperCase();
+  const id=String(sourceId),pid=String(paymentId);
+  if(!confirm(lang==="en"?"Delete this payment and its linked transaction?":"Hapus pembayaran ini beserta transaksi yang terhubung?"))return;
+  if(type==="BILL"){
+    const b=data.bills.find(x=>String(x.id)===id);if(!b)return;
+    b.history=(b.history||[]).filter(p=>String(p.paymentId)!==pid);
+  }else if(type==="DEBT"){
+    const d=data.debts.find(x=>String(x.id)===id);if(!d)return;
+    d.payments=(d.payments||[]).filter(p=>String(p.paymentId)!==pid);
+  }else if(type==="RECEIVABLE"){
+    const r=data.receivables.find(x=>String(x.id)===id);if(!r)return;
+    r.payments=(r.payments||[]).filter(p=>String(p.paymentId)!==pid);
+  }else return;
+  data.tx=data.tx.filter(t=>!(String(t.sourceType||"").toUpperCase()===type&&String(t.sourceId)===id&&String(t.paymentId)===pid));
+  const ok=await persistData();if(!ok)return alert(lang==="en"?"Failed to delete payment.":"Gagal menghapus pembayaran.");
+  closeModal("billHistoryModal");closeModal("debtDetailModal");closeModal("receivableDetailModal");
+  safeRenderAll();showToast(lang==="en"?"Payment deleted":"Pembayaran dihapus");
+}
 
 function renderWallet(){
  $("walletGrid").innerHTML=data.wallets.map(w=>`<div class="wallet-card ${w.hidden?"hidden-wallet":""}" onclick="openWallet(${w.id})">
@@ -2365,10 +2991,44 @@ function renderWallet(){
  switchWalletFinanceTab(walletFinanceTab)
 }
 function openWallet(id=null){
- $("walletId").value="";$("walletTitle").textContent=id?(lang==="en"?"Edit Wallet":"Edit Dompet"):(lang==="en"?"Add Wallet":"Tambah Dompet");$("walletName").value="";$("walletOpening").value="";$("walletHidden").value="0";$("deleteWalletBtn").classList.toggle("hidden",!id);
- if(id){const w=data.wallets.find(x=>x.id===id);$("walletId").value=w.id;$("walletName").value=w.name;$("walletOpening").value=w.opening.toLocaleString("id-ID");$("walletHidden").value=w.hidden?"1":"0"}
- openModal("walletModal")
+  const modal=$("walletModal");
+
+  $("walletId").value="";
+  $("walletTitle").textContent=id
+    ? (lang==="en"?"Edit Wallet":"Edit Dompet")
+    : (lang==="en"?"Add Wallet":"Tambah Dompet");
+  $("walletName").value="";
+  $("walletOpening").value="";
+  $("walletHidden").value="0";
+  $("deleteWalletBtn").classList.toggle("hidden",!id);
+
+  if(id){
+    const w=data.wallets.find(x=>Number(x.id)===Number(id));
+    if(!w)return;
+
+    $("walletId").value=w.id;
+    $("walletName").value=w.name;
+    $("walletOpening").value=Number(w.opening||0).toLocaleString("id-ID");
+    $("walletHidden").value=w.hidden?"1":"0";
+  }
+
+  modal.classList.remove("keyboard-up");
+  modal.classList.add("show");
+  document.body.style.overflow="hidden";
 }
+
+function closeWalletModal(){
+  const modal=$("walletModal");
+  const active=document.activeElement;
+
+  if(active && modal.contains(active) && typeof active.blur==="function"){
+    active.blur();
+  }
+
+  modal.classList.remove("show","keyboard-up");
+  document.body.style.overflow="";
+}
+
 async function saveWallet(){
   const id=+$("walletId").value;
   const name=$("walletName").value.trim();
@@ -2387,7 +3047,7 @@ async function saveWallet(){
   const ok=await persistData();
   if(!ok)return alert("Gagal menyimpan dompet.");
 
-  closeModal("walletModal");
+  closeWalletModal();
   safeRenderAll();
   showToast("Dompet tersimpan");
 }
@@ -2407,7 +3067,7 @@ async function deleteWallet(){
   const ok=await persistData();
   if(!ok)return alert("Gagal menghapus dompet.");
 
-  closeModal("walletModal");
+  closeWalletModal();
   safeRenderAll();
   showToast("Dompet dihapus");
 }
@@ -2508,6 +3168,7 @@ async function deleteBill(){
   if(!confirm(lang==="en"?"Delete this bill?":"Hapus tagihan ini?"))return;
 
   data.bills=data.bills.filter(b=>String(b.id)!==String(id));
+  data.tx=data.tx.filter(t=>!(t.sourceType==="BILL"&&String(t.sourceId)===String(id)));
   const ok=await persistData();
   if(!ok){
     alert("Gagal menghapus tagihan.");
@@ -2519,54 +3180,23 @@ async function deleteBill(){
   showToast("Tagihan dihapus");
 }
 async function payBill(id){
-  const b=data.bills.find(x=>String(x.id)===String(id));
-  if(!b)return;
-
-  if(billPaidThisMonth(b)&&!confirm(
-    lang==="en"?"Already paid this month. Add another payment?":"Bulan ini sudah terbayar. Tambah pembayaran lagi?"
-  ))return;
-
-  const raw=prompt(
-    `${lang==="en"?"Payment amount":"Nominal pembayaran"} ${b.name}:`,
-    Number(b.amount).toLocaleString("id-ID")
-  );
-  if(raw===null)return;
-
-  const amount=money(raw);
-  if(amount<=0)return;
-
-  const paidDate=today();
-  const txId=data.nextTx++;
-  data.tx.push({
-    id:txId,
-    type:"EXPENSE",
-    amount,
-    walletId:Number(b.walletId),
-    mainCategory:b.mainCategory||b.category||"Tagihan",
-    subcategory:b.subcategory||"",
-    category:b.mainCategory||b.category||"Tagihan",
-    date:paidDate,
-    note:b.note||b.name
-  });
-
-  b.history=b.history||[];
-  b.history.push({month:mk(),amount,paidDate,txId});
-  b.amount=amount;
-
-  const ok=await persistData();
-  if(!ok){
-    alert("Gagal menyimpan pembayaran tagihan.");
-    return;
-  }
-
-  safeRenderAll();
-  switchWalletFinanceTab("bills");
-  showToast("Pembayaran tagihan tersimpan");
+  const b=data.bills.find(x=>String(x.id)===String(id));if(!b)return;
+  if(billPaidThisMonth(b)&&!confirm(lang==="en"?"Already paid this month. Add another payment?":"Bulan ini sudah terbayar. Tambah pembayaran lagi?"))return;
+  openFinancePayment("BILL",id,Number(b.amount),`${lang==="en"?"Default amount":"Nominal default"}: ${rp(b.amount)}`);
+}
+async function commitBillPayment(id,amount){
+  const b=data.bills.find(x=>String(x.id)===String(id));if(!b||amount<=0)return;
+  const paidDate=today(),txId=data.nextTx++,paymentId=newPaymentId("bill");
+  data.tx.push({id:txId,type:"EXPENSE",amount,walletId:Number(b.walletId),mainCategory:b.mainCategory||b.category||"Tagihan",subcategory:b.subcategory||"",category:b.mainCategory||b.category||"Tagihan",date:paidDate,note:b.note||b.name,sourceType:"BILL",sourceId:String(b.id),paymentId});
+  b.history=b.history||[];b.history.push({paymentId,month:mk(),amount,paidDate,txId});
+  // b.amount tetap nominal default; pembayaran aktual hanya disimpan di history.
+  const ok=await persistData();if(!ok)return alert(lang==="en"?"Failed to save bill payment.":"Gagal menyimpan pembayaran tagihan.");
+  safeRenderAll();switchWalletFinanceTab("bills");showToast(lang==="en"?"Bill payment saved":"Pembayaran tagihan tersimpan");
 }
 function openBillHistory(id){
  const b=data.bills.find(x=>String(x.id)===String(id));if(!b)return;
  const h=[...(b.history||[])].reverse();
- $("billHistoryContent").innerHTML=h.length?h.map(x=>`<div class="history-item"><b>${rp(x.amount)}</b><br>${lang==="en"?"Paid on":"Dibayar tanggal"} ${formatDate(x.paidDate)}</div>`).join(""):`<div class="empty">${lang==="en"?"No payment history.":"Belum ada riwayat pembayaran."}</div>`;
+ $("billHistoryContent").innerHTML=h.length?h.map(x=>`<div class="history-item"><b>${rp(x.amount)}</b><br>${lang==="en"?"Paid on":"Dibayar tanggal"} ${formatDate(x.paidDate)}${x.paymentId?`<div style="margin-top:7px"><button class="finance-mini-btn" type="button" onclick="deleteFinancePayment('BILL','${String(b.id).replace(/'/g,"\'")}','${String(x.paymentId).replace(/'/g,"\'")}')">${lang==="en"?"Delete payment":"Hapus pembayaran"}</button></div>`:""}</div>`).join(""):`<div class="empty">${lang==="en"?"No payment history.":"Belum ada riwayat pembayaran."}</div>`;
  openModal("billHistoryModal")
 }
 function renderBills(){
@@ -2716,6 +3346,42 @@ function bindSettingDropState(){
   });
 }
 
+
+const FONT_SIZE_KEY="noted_font_size";
+
+function getFontSize(){
+  try{
+    const size=localStorage.getItem(FONT_SIZE_KEY);
+    return ["small","medium","large"].includes(size)?size:"small";
+  }catch(e){
+    return "small";
+  }
+}
+
+function applyFontSize(size){
+  document.body.classList.remove("font-medium","font-large");
+  if(size==="medium")document.body.classList.add("font-medium");
+  if(size==="large")document.body.classList.add("font-large");
+
+  const sm=$("fontSmallMark");
+  const md=$("fontMediumMark");
+  const lg=$("fontLargeMark");
+  if(sm)sm.textContent=size==="small"?"✓":"";
+  if(md)md.textContent=size==="medium"?"✓":"";
+  if(lg)lg.textContent=size==="large"?"✓":"";
+}
+
+function setFontSize(size){
+  if(!["small","medium","large"].includes(size))size="small";
+  try{localStorage.setItem(FONT_SIZE_KEY,size)}catch(e){}
+  applyFontSize(size);
+  showToast(
+    size==="small"?"Ukuran font: Kecil":
+    size==="medium"?"Ukuran font: Menengah":
+    "Ukuran font: Besar"
+  );
+}
+
 function renderSettings(){
  const nameEl=$("userDisplayName");
  const emailEl=$("userDisplayEmail");
@@ -2733,6 +3399,7 @@ function renderSettings(){
 
  bindSettingDropState();
  loadSettingDropState();
+ applyFontSize(getFontSize());
 }
 function openUserModal(){
   const modal=$("userModal");
@@ -2784,7 +3451,7 @@ function getNotifications(){
 }
 function updateNotifications(){const n=getNotifications().length;$("notifyDot").textContent=n;$("notifyDot").classList.toggle("hidden",n===0)}
 function openNotifications(){const n=getNotifications();$("notificationsList").innerHTML=n.length?n.map(x=>`<div class="notify-item"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join(""):`<div class="empty">${lang==="en"?"No notifications.":"Tidak ada notifikasi."}</div>`;openModal("notificationsModal")}
-function backupData(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({app:"Noted",version:"13.9",data},null,2)],{type:"application/json"}));a.href=url;a.download=`noted-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
+function backupData(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({app:"Noted",version:"15.0",schemaVersion:SCHEMA_VERSION,data},null,2)],{type:"application/json"}));a.href=url;a.download=`noted-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
 $("restoreFile").onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const p=JSON.parse(await f.text()),d=normalize(p.data||p);if(!d.wallets||!d.tx||!d.bills)throw 0;if(confirm(lang==="en"?"Replace current data?":"Ganti semua data saat ini?")){data=d;await save()}}catch(_){alert(lang==="en"?"Invalid backup file.":"File backup tidak valid.")}e.target.value=""}
 function resetData(){if(confirm(lang==="en"?"Delete all data?":"Hapus semua data?")&&confirm(lang==="en"?"Are you sure?":"Yakin?")){data=defaultData();save()}}
 function loadDemo(){
@@ -2796,9 +3463,9 @@ function loadDemo(){
  data.nextWallet=4;data.nextTx=4;save()
 }
 function mix(a,b,p){const x=s=>parseInt(s,16),ah=a.replace("#",""),bh=b.replace("#",""),ar=x(ah.slice(0,2)),ag=x(ah.slice(2,4)),ab=x(ah.slice(4,6)),br=x(bh.slice(0,2)),bg=x(bh.slice(2,4)),bb=x(bh.slice(4,6)),h=n=>Math.round(n).toString(16).padStart(2,"0");return "#"+h(ar*(1-p)+br*p)+h(ag*(1-p)+bg*p)+h(ab*(1-p)+bb*p)}
-function applyTheme(t,index=null){document.documentElement.style.setProperty("--bg",t.bg);document.documentElement.style.setProperty("--surface",t.surface);document.documentElement.style.setProperty("--accent",t.accent);document.documentElement.style.setProperty("--surface-soft",mix(t.surface,t.bg,.35));document.documentElement.style.setProperty("--line",mix(t.surface,t.bg,.62));localStorage.setItem(THEME_KEY,JSON.stringify(t));renderSwatches(index)}
+function applyTheme(t,index=null){document.documentElement.style.setProperty("--bg",t.bg);document.documentElement.style.setProperty("--surface",t.surface);document.documentElement.style.setProperty("--accent",t.accent);document.documentElement.style.setProperty("--surface-soft",mix(t.surface,t.bg,.35));document.documentElement.style.setProperty("--line",mix(t.surface,t.bg,.62));const raw=JSON.stringify(t);localStorage.setItem(NOTED_THEME_KEY,raw);localStorage.setItem(THEME_KEY,raw);renderSwatches(index)}
 function renderSwatches(active=null){$("swatches").innerHTML=themes.map((t,i)=>`<button class="swatch ${active===i?"active":""}" title="${t.name}" onclick='applyTheme(${JSON.stringify(t)},${i})' style="background:linear-gradient(135deg,${t.bg} 50%,${t.surface} 50%)"></button>`).join("")}
-function loadTheme(){let t=themes[0];try{const x=JSON.parse(localStorage.getItem(THEME_KEY));if(x?.bg&&x?.surface&&x?.accent)t=x}catch(e){}const idx=themes.findIndex(x=>x.bg.toLowerCase()===t.bg.toLowerCase()&&x.surface.toLowerCase()===t.surface.toLowerCase()&&x.accent.toLowerCase()===t.accent.toLowerCase());applyTheme(t,idx>=0?idx:null)}
+function loadTheme(){let t=themes[0];try{const x=JSON.parse(localStorage.getItem(NOTED_THEME_KEY)||localStorage.getItem(THEME_KEY));if(x?.bg&&x?.surface&&x?.accent)t=x}catch(e){}const idx=themes.findIndex(x=>x.bg.toLowerCase()===t.bg.toLowerCase()&&x.surface.toLowerCase()===t.surface.toLowerCase()&&x.accent.toLowerCase()===t.accent.toLowerCase());applyTheme(t,idx>=0?idx:null)}
 function safeCall(name,fn){
   try{
     fn();
@@ -2824,25 +3491,39 @@ function renderAll(){
 }
 
 function runNotedDiagnostics(){
-  const issues=[];
-  const requiredIds=[
-    "homeBalance","walletGrid","billTable","debtTable","receivableTable",
-    "categoryReport","swatches","subcategoryModal","subType","subMainCat","subName",
-    "quickAddModal","quickChooserView","quickFormView","txAmount","txWallet","txNote",
-    "debtModal","debtName","debtTotal","debtInstallmentCount",
-    "receivableModal","receivableName","receivableTotal"
-  ];
+  const issues=[],warnings=[];
+  const requiredIds=["homeBalance","walletGrid","billTable","debtTable","receivableTable","categoryReport","swatches","subcategoryModal","subType","subMainCat","subName","quickAddModal","quickChooserView","quickFormView","txAmount","txWallet","txNote","debtModal","debtName","debtTotal","debtInstallmentCount","receivableModal","receivableName","receivableTotal","financePaymentModal","financePaymentAmount"];
   requiredIds.forEach(id=>{if(!$(id))issues.push("Missing #"+id)});
-  if(!Array.isArray(data.wallets))issues.push("wallets invalid");
-  if(!Array.isArray(data.tx))issues.push("tx invalid");
-  if(!Array.isArray(data.bills))issues.push("bills invalid");
-  if(!Array.isArray(data.debts))issues.push("debts invalid");
-  if(!Array.isArray(data.receivables))issues.push("receivables invalid");
+  ["wallets","tx","bills","debts","receivables"].forEach(k=>{if(!Array.isArray(data[k]))issues.push(`${k} invalid`)});
   if(!data.categories?.EXPENSE||!data.categories?.INCOME)issues.push("categories invalid");
-  return {ok:issues.length===0,issues};
+  const walletIds=new Set(),txIds=new Set();
+  data.wallets.forEach(w=>{if(walletIds.has(Number(w.id)))issues.push(`duplicate wallet id ${w.id}`);walletIds.add(Number(w.id));});
+  data.tx.forEach(t=>{
+    if(txIds.has(Number(t.id)))issues.push(`duplicate tx id ${t.id}`);txIds.add(Number(t.id));
+    if(!walletIds.has(Number(t.walletId)))issues.push(`tx ${t.id} references missing wallet ${t.walletId}`);
+    if(t.type==="TRANSFER"&&!walletIds.has(Number(t.toWalletId)))issues.push(`transfer ${t.id} references missing destination wallet ${t.toWalletId}`);
+    if(Number(t.amount)<=0)issues.push(`tx ${t.id} has invalid amount`);
+    if(t.sourceType&&(!t.sourceId||!t.paymentId))issues.push(`finance tx ${t.id} missing linkage metadata`);
+  });
+  data.bills.forEach(b=>(b.history||[]).forEach(h=>{
+    if(h.txId&&!txIds.has(Number(h.txId)))issues.push(`bill ${b.id} payment ${h.paymentId} missing tx ${h.txId}`);
+    if(!h.txId)warnings.push(`bill ${b.id} has legacy unlinked payment`);
+  }));
+  data.debts.forEach(d=>{
+    if(!walletIds.has(Number(d.walletId)))issues.push(`debt ${d.id} references missing wallet`);
+    if(debtPaidAmount(d)>Number(d.total||0)+0.001)issues.push(`debt ${d.id} principal paid exceeds total`);
+    (d.payments||[]).forEach(p=>{if(p.txId&&!txIds.has(Number(p.txId)))issues.push(`debt ${d.id} payment ${p.paymentId} missing tx ${p.txId}`);if(!p.txId)warnings.push(`debt ${d.id} has legacy unlinked payment`);});
+  });
+  data.receivables.forEach(r=>{
+    if(!walletIds.has(Number(r.walletId)))issues.push(`receivable ${r.id} references missing wallet`);
+    if(receivablePaidAmount(r)>Number(r.total||0)+0.001)issues.push(`receivable ${r.id} paid exceeds total`);
+    (r.payments||[]).forEach(p=>{if(p.txId&&!txIds.has(Number(p.txId)))issues.push(`receivable ${r.id} payment ${p.paymentId} missing tx ${p.txId}`);if(!p.txId)warnings.push(`receivable ${r.id} has legacy unlinked payment`);});
+  });
+  return {ok:issues.length===0,issues,warnings,storageMode,schemaVersion:data.schemaVersion||1};
 }
 
 async function startApp(){
+  applyFontSize(getFontSize());
  await initStorage();
  loadTheme();
  applyLanguage();
@@ -2853,9 +3534,28 @@ async function startApp(){
      try{
        const reg=await navigator.serviceWorker.register("./sw.js");
        reg.update().catch(()=>{});
-     }catch(e){}
+     }catch(e){console.warn("Service Worker tidak aktif:",e)}
    });
  }
+  const lastPage=loadLastPage();
+  try{
+    go(lastPage);
+    if(lastPage==="wallet"){
+      switchWalletFinanceTab(loadLastWalletTab());
+    }
+  }catch(e){
+    console.error("restore last page:",e);
+    go("home");
+  }
+  const diagnostic=runNotedDiagnostics();
+  if(!diagnostic.ok||diagnostic.warnings.length)console.warn("Noted diagnostics:",diagnostic);
+  if(lastPage==="wallet"){
+    const financeOpen=loadFinanceOpenState();
+    if(financeOpen){
+      setTimeout(()=>openFinancePage(financeOpen),0);
+    }
+  }
+
 }
 startApp();
 </script>
