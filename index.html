@@ -840,6 +840,34 @@ body.finance-page-open{
   overflow:hidden;
 }
 
+
+/* ===== Receipt Scanner ===== */
+.receipt-scan-choice{grid-column:1/-1}
+.receipt-scan-box{display:grid;gap:10px}
+.receipt-preview-wrap{display:none;background:var(--surface-soft);border:1px solid var(--line);border-radius:16px;padding:10px;text-align:center}
+.receipt-preview-wrap.show{display:block}
+.receipt-preview{display:block;max-width:100%;max-height:230px;margin:0 auto;border-radius:12px;object-fit:contain}
+.receipt-status{background:var(--surface-soft);border:1px solid var(--line);border-radius:14px;padding:10px;font-size:8.5px;line-height:1.45;color:var(--muted)}
+.receipt-progress{height:7px;border-radius:999px;background:var(--surface-soft);overflow:hidden;border:1px solid var(--line);margin-top:7px}
+.receipt-progress > span{display:block;height:100%;width:0;background:var(--accent);transition:width .18s ease}
+.receipt-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.receipt-raw{min-height:100px;resize:vertical;line-height:1.45}
+.receipt-confidence{font-size:7.5px;color:var(--muted);margin-top:4px}
+@media(max-width:360px){.receipt-actions{grid-template-columns:1fr}}
+
+
+/* ===== Receipt Archive & Storage ===== */
+.receipt-save-option{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid var(--line);background:var(--surface-soft);border-radius:14px;font-size:9px;font-weight:750}
+.receipt-save-option small{display:block;color:var(--muted);font-size:7.5px;font-weight:500;margin-top:3px;line-height:1.4}
+.receipt-save-option input{width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto}
+.receipt-photo-btn{width:100%;margin-top:8px}
+.receipt-image-view{display:block;max-width:100%;max-height:66vh;margin:0 auto;border-radius:16px;object-fit:contain;background:var(--surface-soft)}
+.receipt-image-meta{font-size:8px;color:var(--muted);line-height:1.5;margin-top:9px;text-align:center}
+.receipt-storage-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-top:1px solid var(--line);font-size:9.5px;font-weight:700}
+.receipt-storage-row small{display:block;font-size:8px;color:var(--muted);font-weight:500;margin-top:3px;line-height:1.4}
+.receipt-storage-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+.receipt-storage-row select{max-width:145px;border:1px solid var(--line);background:var(--surface-soft);border-radius:12px;padding:8px 9px;font-size:9px}
+
 </style>
 </head>
 <body>
@@ -1025,6 +1053,23 @@ body.finance-page-open{
     </div>
   </details>
 
+
+  <details class="setting-card setting-drop" data-setting-key="receiptStorage" open>
+    <summary class="setting-drop-head">
+      <span class="setting-title">Penyimpanan Nota</span>
+      <span class="setting-drop-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6 9 6 6 6-6"/></svg></span>
+    </summary>
+    <div class="setting-drop-body">
+      <div class="setting-sub">Foto nota disimpan terpisah dari transaksi utama di IndexedDB. Backup JSON tetap ringan dan tidak menyertakan foto.</div>
+      <label class="receipt-storage-row"><span>Simpan foto nota otomatis<small>Default saat scan nota baru</small></span><input id="receiptSaveDefaultSetting" type="checkbox" onchange="setReceiptSaveDefault(this.checked)"></label>
+      <label class="receipt-storage-row"><span>Kompres foto otomatis<small>Maks. 1400px agar storage hemat</small></span><input id="receiptCompressSetting" type="checkbox" onchange="setReceiptCompression(this.checked)"></label>
+      <label class="receipt-storage-row"><span>Hapus otomatis<small>Foto yang lebih lama dari periode ini</small></span><select id="receiptRetentionSetting" onchange="setReceiptRetention(this.value)"><option value="0">Jangan otomatis</option><option value="3">3 bulan</option><option value="6">6 bulan</option><option value="12">12 bulan</option></select></label>
+      <div class="setting-sub" id="receiptStorageUsage">Menghitung pemakaian foto nota…</div>
+      <button class="setting-row" type="button" onclick="cleanupExpiredReceipts(true)"><span>Bersihkan Foto Kedaluwarsa<small>Hapus foto sesuai periode retensi sekarang</small></span><span>›</span></button>
+      <button class="setting-row" type="button" onclick="refreshReceiptStorageUsage()"><span>Refresh Penggunaan Storage<small>Hitung ulang jumlah dan ukuran foto nota</small></span><span>↻</span></button>
+    </div>
+  </details>
+
 <details class="setting-card setting-drop" data-setting-key="data" open>
     <summary class="setting-drop-head">
       <span class="setting-title" data-i18n="data">Data</span>
@@ -1034,8 +1079,10 @@ body.finance-page-open{
     </summary>
     <div class="setting-drop-body">
       <div class="setting-sub" id="storageStatusText">IndexedDB • data lokal di perangkat</div>
-      <button class="setting-row" onclick="backupData()"><span><span data-i18n="backup">Backup Data</span><small data-i18n="backupSub">Simpan ke file JSON</small></span><span>›</span></button>
-      <label class="setting-row" style="cursor:pointer"><span><span data-i18n="restore">Restore Data</span><small data-i18n="restoreSub">Kembalikan dari backup</small></span><span>›</span><input id="restoreFile" type="file" accept=".json" hidden></label>
+      <button class="setting-row" onclick="backupData()"><span><span data-i18n="backup">Backup Data</span><small data-i18n="backupSub">Simpan data ringan ke file JSON</small></span><span>›</span></button>
+      <label class="setting-row" style="cursor:pointer"><span><span data-i18n="restore">Restore Data</span><small data-i18n="restoreSub">Kembalikan dari backup JSON</small></span><span>›</span><input id="restoreFile" type="file" accept=".json,application/json" hidden></label>
+      <button class="setting-row" type="button" onclick="backupFullNoted()"><span><span>Backup Lengkap (ZIP)</span><small>Data + seluruh foto nota + pengaturan Noted</small></span><span>›</span></button>
+      <label class="setting-row" style="cursor:pointer"><span><span>Restore Lengkap (ZIP)</span><small>Pindahkan seluruh data dan foto nota ke perangkat ini</small></span><span>›</span><input id="restoreFullFile" type="file" accept=".zip,application/zip" hidden></label>
       <button class="setting-row" onclick="loadDemo()"><span><span data-i18n="demo">Muat Data Demo</span><small data-i18n="demoSub">Lihat contoh tampilan</small></span><span>›</span></button>
       <button class="setting-row" onclick="resetData()"><span><span data-i18n="reset">Reset Semua Data</span><small data-i18n="resetSub">Hapus data lokal aplikasi</small></span><span>›</span></button>
     </div>
@@ -1116,6 +1163,16 @@ body.finance-page-open{
           </svg>
         </span>
         <span>Pengeluaran</span>
+      </button>
+      <button class="quick-add-choice receipt-scan-choice" type="button" onclick="closeQuickTransactionModal();openReceiptScanner()">
+        <span class="qa-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 7V5a1 1 0 0 1 1-1h2"/><path d="M17 4h2a1 1 0 0 1 1 1v2"/>
+            <path d="M20 17v2a1 1 0 0 1-1 1h-2"/><path d="M7 20H5a1 1 0 0 1-1-1v-2"/>
+            <path d="M7 9h10M7 12h7M7 15h9"/>
+          </svg>
+        </span>
+        <span>Scan Nota</span>
       </button>
     </div>
   </div>
@@ -1381,12 +1438,59 @@ body.finance-page-open{
 <div id="moreModal" class="modal-bg" onclick="if(event.target===this)closeModal('moreModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 data-i18n="more">Lainnya</h3><button class="close" onclick="closeModal('moreModal')">×</button></div>
   <div class="action-sheet">
+    <button onclick="closeModal('moreModal');openReceiptScanner()">Scan Nota Otomatis</button>
     <button onclick="closeModal('moreModal');openBill()" data-i18n="addBill">Tambah Tagihan</button>
     <button onclick="closeModal('moreModal');openWallet()" data-i18n="addWallet">Tambah Dompet</button>
     <button onclick="closeModal('moreModal');go('setting')" data-i18n="setting">Setting</button>
     <button onclick="closeModal('moreModal');backupData()" data-i18n="backup">Backup Data</button>
   </div>
 </div></div>
+
+
+<div id="receiptModal" class="modal-bg" onclick="if(event.target===this)closeReceiptScanner()">
+  <div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
+    <div class="modal-head"><h3>Scan Nota</h3><button class="close" type="button" onclick="closeReceiptScanner()">×</button></div>
+    <div class="receipt-scan-box">
+      <input id="receiptCamera" type="file" accept="image/*" capture="environment" hidden onchange="handleReceiptFile(event)">
+      <input id="receiptUpload" type="file" accept="image/*" hidden onchange="handleReceiptFile(event)">
+      <div class="receipt-preview-wrap" id="receiptPreviewWrap"><img id="receiptPreview" class="receipt-preview" alt="Preview nota"></div>
+      <div id="receiptStatus" class="receipt-status">Ambil foto nota dengan kamera atau upload gambar dari galeri. Noted akan membaca merchant, tanggal, dan total belanja.</div>
+      <div class="receipt-progress"><span id="receiptProgressBar"></span></div>
+      <div class="receipt-actions">
+        <label class="btn primary" for="receiptCamera" style="display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer">📷 Ambil Foto Nota</label>
+        <label class="btn soft" for="receiptUpload" style="display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer">🖼️ Upload dari Galeri</label>
+      </div>
+      <button id="receiptRescanBtn" class="btn" type="button" style="width:100%" onclick="scanCurrentReceipt()" disabled>Scan Ulang Foto Ini</button>
+      <label class="field"><span>Merchant / Toko</span><input id="receiptMerchant" class="input" type="text" placeholder="Contoh: Indomaret"></label>
+      <label class="field"><span>Nominal Pengeluaran</span><input id="receiptAmount" class="input" inputmode="numeric" placeholder="0"></label>
+      <label class="field"><span>Tanggal</span><input id="receiptDate" class="input" type="date"></label>
+      <label class="field"><span>Dompet</span><select id="receiptWallet" class="select"></select></label>
+      <label class="field"><span>Kategori Utama</span><select id="receiptMainCat" class="select" onchange="refreshReceiptSubcategory()"></select></label>
+      <label class="field"><span>Subkategori</span><select id="receiptSubCat" class="select"></select></label>
+      <label class="field"><span>Catatan</span><input id="receiptNote" class="input" type="text" placeholder="Diisi otomatis dari nama toko"></label>
+      <details>
+        <summary style="font-size:8.5px;color:var(--muted);cursor:pointer;padding:4px 2px 8px">Lihat teks hasil OCR</summary>
+        <textarea id="receiptRawText" class="input receipt-raw" placeholder="Teks nota akan muncul di sini"></textarea>
+      </details>
+      <label class="receipt-save-option"><span>Simpan foto nota<small>Opsional. Foto dikompres dan disimpan lokal agar bisa dibuka lagi dari detail transaksi.</small></span><input id="receiptSaveImage" type="checkbox"></label>
+      <div id="receiptImageSaveInfo" class="receipt-confidence">Foto nota hanya disimpan jika opsi di atas aktif.</div>
+      <button id="receiptSaveBtn" class="btn primary" type="button" style="width:100%" onclick="saveReceiptExpense()">Simpan sebagai Pengeluaran</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="receiptImageModal" class="modal-bg" onclick="if(event.target===this)closeReceiptImageViewer()">
+  <div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
+    <div class="modal-head"><h3>Foto Nota</h3><button class="close" type="button" onclick="closeReceiptImageViewer()">×</button></div>
+    <img id="receiptImageViewer" class="receipt-image-view" alt="Foto nota transaksi">
+    <div id="receiptImageMeta" class="receipt-image-meta"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+      <button class="btn soft" type="button" onclick="closeReceiptImageViewer()">Tutup</button>
+      <button class="btn danger" type="button" onclick="deleteCurrentReceiptImage()">Hapus Foto</button>
+    </div>
+  </div>
+</div>
 
 <div id="allTxModal" class="modal-bg" onclick="if(event.target===this)closeModal('allTxModal')"><div class="modal" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
   <div class="modal-head"><h3 data-i18n="allTransactions">Semua Transaksi</h3><button class="close" onclick="closeModal('allTxModal')">×</button></div>
@@ -1398,7 +1502,11 @@ const $=id=>document.getElementById(id);
 const fmt=new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0});
 const THEME_KEY="dompet_lokal_v12_theme",LANG_KEY="dompet_lokal_v12_lang";
 const NOTED_THEME_KEY="noted_theme",NOTED_LANG_KEY="noted_lang",NOTED_FALLBACK_KEY="noted_state_v2";
-const DB_NAME="dompet_lokal_db",DB_VERSION=1,STORE_NAME="app",STATE_KEY="state",SCHEMA_VERSION=2;
+const DB_NAME="dompet_lokal_db",DB_VERSION=2,STORE_NAME="app",STATE_KEY="state",SCHEMA_VERSION=3;
+const RECEIPT_STORE="receipt_images";
+const RECEIPT_SAVE_DEFAULT_KEY="noted_receipt_save_default";
+const RECEIPT_COMPRESS_KEY="noted_receipt_compress";
+const RECEIPT_RETENTION_KEY="noted_receipt_retention_months";
 const LEGACY_KEYS=[
   "dompet_lokal_v10_4_no_top_right_icons",
   "dompet_lokal_v10_3_topicon_fix",
@@ -1581,6 +1689,7 @@ function openDB(){
    req.onupgradeneeded=()=>{
      const database=req.result;
      if(!database.objectStoreNames.contains(STORE_NAME))database.createObjectStore(STORE_NAME);
+     if(!database.objectStoreNames.contains(RECEIPT_STORE))database.createObjectStore(RECEIPT_STORE);
    };
    req.onsuccess=()=>resolve(req.result);
    req.onerror=()=>reject(req.error||new Error("Gagal membuka IndexedDB"));
@@ -1603,6 +1712,105 @@ function idbSet(key,value){
    tx.onabort=()=>reject(tx.error);
  });
 }
+function receiptStoreReady(){return !!(db&&db.objectStoreNames&&db.objectStoreNames.contains(RECEIPT_STORE))}
+function receiptIdbGet(key){
+ return new Promise((resolve,reject)=>{
+   if(!receiptStoreReady())return reject(new Error("Penyimpanan foto nota belum tersedia"));
+   const tx=db.transaction(RECEIPT_STORE,"readonly");
+   const req=tx.objectStore(RECEIPT_STORE).get(key);
+   req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error);
+ });
+}
+function receiptIdbSet(key,value){
+ return new Promise((resolve,reject)=>{
+   if(!receiptStoreReady())return reject(new Error("Penyimpanan foto nota belum tersedia"));
+   const tx=db.transaction(RECEIPT_STORE,"readwrite");
+   tx.objectStore(RECEIPT_STORE).put(value,key);
+   tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+ });
+}
+function receiptIdbDelete(key){
+ return new Promise((resolve,reject)=>{
+   if(!receiptStoreReady())return resolve();
+   const tx=db.transaction(RECEIPT_STORE,"readwrite");tx.objectStore(RECEIPT_STORE).delete(key);
+   tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+ });
+}
+function receiptIdbClear(){
+ return new Promise((resolve,reject)=>{
+   if(!receiptStoreReady())return resolve();
+   const tx=db.transaction(RECEIPT_STORE,"readwrite");tx.objectStore(RECEIPT_STORE).clear();
+   tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+ });
+}
+function receiptIdbEntries(){
+ return new Promise((resolve,reject)=>{
+   if(!receiptStoreReady())return resolve([]);
+   const tx=db.transaction(RECEIPT_STORE,"readonly"),store=tx.objectStore(RECEIPT_STORE),out=[];
+   const req=store.openCursor();
+   req.onsuccess=e=>{const c=e.target.result;if(c){out.push({key:c.key,value:c.value});c.continue()}else resolve(out)};
+   req.onerror=()=>reject(req.error);
+ });
+}
+function getReceiptSaveDefault(){try{return localStorage.getItem(RECEIPT_SAVE_DEFAULT_KEY)==="1"}catch(e){return false}}
+function getReceiptCompression(){try{return localStorage.getItem(RECEIPT_COMPRESS_KEY)!=="0"}catch(e){return true}}
+function getReceiptRetention(){try{return [0,3,6,12].includes(Number(localStorage.getItem(RECEIPT_RETENTION_KEY)))?Number(localStorage.getItem(RECEIPT_RETENTION_KEY)):0}catch(e){return 0}}
+function setReceiptSaveDefault(v){try{localStorage.setItem(RECEIPT_SAVE_DEFAULT_KEY,v?"1":"0")}catch(e){}showToast(v?"Foto nota: simpan otomatis aktif":"Foto nota: simpan otomatis nonaktif")}
+function setReceiptCompression(v){try{localStorage.setItem(RECEIPT_COMPRESS_KEY,v?"1":"0")}catch(e){}showToast(v?"Kompresi nota aktif":"Kompresi nota nonaktif")}
+function setReceiptRetention(v){const n=[0,3,6,12].includes(Number(v))?Number(v):0;try{localStorage.setItem(RECEIPT_RETENTION_KEY,String(n))}catch(e){}showToast(n?`Retensi nota: ${n} bulan`:"Hapus otomatis dinonaktifkan")}
+function formatBytes(n){n=Number(n)||0;if(n<1024)return `${n} B`;if(n<1048576)return `${(n/1024).toFixed(1)} KB`;return `${(n/1048576).toFixed(1)} MB`}
+async function refreshReceiptStorageUsage(){
+ const el=$("receiptStorageUsage");if(!el)return;
+ try{
+   const entries=await receiptIdbEntries();
+   const own=entries.reduce((sum,x)=>sum+Number(x.value?.size||x.value?.blob?.size||0),0);
+   let extra="";
+   if(navigator.storage?.estimate){const e=await navigator.storage.estimate();if(e?.usage!=null&&e?.quota)extra=` · Total situs ${formatBytes(e.usage)} / ${formatBytes(e.quota)}`}
+   el.textContent=`${entries.length} foto nota · ${formatBytes(own)}${extra}`;
+ }catch(e){el.textContent="Penggunaan foto nota belum tersedia"}
+}
+async function cleanupExpiredReceipts(manual=false){
+ const months=getReceiptRetention();
+ if(!months){if(manual)alert("Hapus otomatis masih dinonaktifkan. Pilih 3, 6, atau 12 bulan terlebih dahulu.");return 0}
+ const cutoff=Date.now()-(months*30.4375*24*60*60*1000);let removed=0;
+ try{
+   const entries=await receiptIdbEntries();
+   for(const item of entries){if(Number(item.value?.createdAt||0)<cutoff){await receiptIdbDelete(item.key);removed++;const t=data.tx.find(x=>String(x.receiptImageId||"")===String(item.key));if(t)delete t.receiptImageId}}
+   if(removed)await persistData();
+   await refreshReceiptStorageUsage();
+   if(manual)showToast(removed?`${removed} foto nota dihapus`:"Tidak ada foto kedaluwarsa");
+ }catch(e){console.error("cleanup receipts",e);if(manual)alert("Gagal membersihkan foto nota.")}
+ return removed;
+}
+function blobFromCanvas(canvas,type="image/webp",quality=.78){return new Promise(resolve=>canvas.toBlob(resolve,type,quality))}
+function loadImageFile(file){return new Promise((resolve,reject)=>{const u=URL.createObjectURL(file),img=new Image();img.onload=()=>{URL.revokeObjectURL(u);resolve(img)};img.onerror=e=>{URL.revokeObjectURL(u);reject(e)};img.src=u})}
+async function compressReceiptImage(file){
+ if(!getReceiptCompression())return {blob:file,width:0,height:0,compressed:false};
+ const img=await loadImageFile(file),max=1400,scale=Math.min(1,max/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
+ const w=Math.max(1,Math.round((img.naturalWidth||img.width)*scale)),h=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
+ const c=document.createElement("canvas");c.width=w;c.height=h;const ctx=c.getContext("2d");ctx.drawImage(img,0,0,w,h);
+ let blob=await blobFromCanvas(c,"image/webp",.78);if(!blob)blob=await blobFromCanvas(c,"image/jpeg",.8);if(!blob)blob=file;
+ return {blob,width:w,height:h,compressed:blob!==file};
+}
+function makeReceiptImageId(txId){return `receipt-${txId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`}
+let receiptImageViewerUrl=null,receiptImageViewerTxId=null;
+async function openReceiptImageForTx(txId){
+ const t=data.tx.find(x=>Number(x.id)===Number(txId));if(!t?.receiptImageId)return alert("Transaksi ini tidak memiliki foto nota tersimpan.");
+ try{
+   const rec=await receiptIdbGet(t.receiptImageId);if(!rec?.blob)return alert("Foto nota tidak ditemukan. Mungkin sudah dibersihkan dari penyimpanan.");
+   if(receiptImageViewerUrl)URL.revokeObjectURL(receiptImageViewerUrl);receiptImageViewerUrl=URL.createObjectURL(rec.blob);receiptImageViewerTxId=Number(txId);
+   $("receiptImageViewer").src=receiptImageViewerUrl;$("receiptImageMeta").textContent=`${formatBytes(rec.size||rec.blob.size)} · Disimpan ${new Date(rec.createdAt||Date.now()).toLocaleString("id-ID")}`;openModal("receiptImageModal");
+ }catch(e){console.error(e);alert("Gagal membuka foto nota.")}
+}
+function closeReceiptImageViewer(){closeModal("receiptImageModal");if(receiptImageViewerUrl){URL.revokeObjectURL(receiptImageViewerUrl);receiptImageViewerUrl=null}receiptImageViewerTxId=null}
+async function deleteCurrentReceiptImage(){
+ const t=data.tx.find(x=>Number(x.id)===Number(receiptImageViewerTxId));if(!t?.receiptImageId)return closeReceiptImageViewer();
+ if(!confirm("Hapus foto nota ini? Data transaksi tetap disimpan."))return;
+ const imageId=t.receiptImageId;delete t.receiptImageId;
+ const ok=await persistData();if(!ok){t.receiptImageId=imageId;return alert("Gagal memperbarui transaksi.")}
+ try{await receiptIdbDelete(imageId)}catch(e){console.error(e)}closeReceiptImageViewer();safeRenderAll();refreshReceiptStorageUsage();showToast("Foto nota dihapus");
+}
+
 function readLegacyData(){
  for(const key of [NOTED_FALLBACK_KEY,...LEGACY_KEYS]){
    try{
@@ -1703,7 +1911,7 @@ function today(date=new Date()){return `${date.getFullYear()}-${String(date.getM
 function mk(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`}
 function formatDate(s){if(!s)return"-";const d=new Date(s+"T00:00:00");return d.toLocaleDateString(lang==="en"?"en-US":"id-ID",{day:"numeric",month:"short",year:"numeric"})}
 function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-["txAmount","walletOpening","billAmount","debtTotal","debtInstallment","receivableTotal","financePaymentAmount"].forEach(id=>{const el=$(id);if(el)el.addEventListener("input",e=>{const n=money(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""})});
+["txAmount","walletOpening","billAmount","debtTotal","debtInstallment","receivableTotal","financePaymentAmount","receiptAmount"].forEach(id=>{const el=$(id);if(el)el.addEventListener("input",e=>{const n=money(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""})});
 $("debtTotal").addEventListener("blur",recalcDebtInstallment);
 $("debtInstallmentCount").addEventListener("change",recalcDebtInstallment);
 function go(id){
@@ -1722,6 +1930,240 @@ function go(id){
 
 
 
+
+
+let receiptCurrentFile=null;
+let receiptPreviewUrl=null;
+let receiptScanning=false;
+
+function setReceiptStatus(text,progress=0){
+  const s=$("receiptStatus"),bar=$("receiptProgressBar");
+  if(s)s.textContent=text;
+  if(bar)bar.style.width=`${Math.max(0,Math.min(100,Math.round(progress)))}%`;
+}
+function openReceiptCamera(){
+  if(receiptScanning)return;
+  const el=$("receiptCamera");
+  if(el)el.click();
+}
+function openReceiptUpload(){
+  if(receiptScanning)return;
+  const el=$("receiptUpload");
+  if(el)el.click();
+}
+function openReceiptScanner(){
+  const visible=data.wallets.filter(w=>!w.hidden);
+  if(!visible.length){
+    alert("Tidak ada dompet aktif. Tampilkan atau tambah dompet terlebih dahulu.");
+    return;
+  }
+  const walletSel=$("receiptWallet");
+  walletSel.innerHTML=visible.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join("");
+  walletSel.value=String(visible[0].id);
+  fillCategorySelects("EXPENSE","receiptMainCat","receiptSubCat");
+  $("receiptDate").value=today();
+  $("receiptMerchant").value="";
+  $("receiptAmount").value="";
+  $("receiptNote").value="";
+  $("receiptRawText").value="";
+  if($("receiptCamera"))$("receiptCamera").value="";
+  if($("receiptUpload"))$("receiptUpload").value="";
+  $("receiptRescanBtn").disabled=true;
+  $("receiptSaveBtn").disabled=false;
+  if($("receiptSaveImage"))$("receiptSaveImage").checked=getReceiptSaveDefault();
+  if($("receiptImageSaveInfo"))$("receiptImageSaveInfo").textContent=getReceiptCompression()?"Jika disimpan, foto akan dikompres maksimal 1400px.":"Kompresi dimatikan; foto asli akan disimpan.";
+  if(receiptPreviewUrl){URL.revokeObjectURL(receiptPreviewUrl);receiptPreviewUrl=null}
+  $("receiptPreviewWrap").classList.remove("show");
+  setReceiptStatus("Ambil foto nota dengan kamera atau upload gambar dari galeri. Noted akan membaca merchant, tanggal, dan total belanja.",0);
+  openModal("receiptModal");
+}
+function closeReceiptScanner(){
+  if(receiptScanning)return;
+  closeModal("receiptModal");
+  if(receiptPreviewUrl){URL.revokeObjectURL(receiptPreviewUrl);receiptPreviewUrl=null}
+  receiptCurrentFile=null;
+}
+function refreshReceiptSubcategory(){
+  const cats=data.categories.EXPENSE||{};
+  const main=$("receiptMainCat").value;
+  $("receiptSubCat").innerHTML=(cats[main]||[]).map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
+}
+async function ensureReceiptOcr(){
+  if(window.Tesseract)return true;
+  if(window.__notedOcrLoading)return window.__notedOcrLoading;
+  window.__notedOcrLoading=new Promise((resolve,reject)=>{
+    const script=document.createElement("script");
+    script.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    script.async=true;
+    script.onload=()=>resolve(true);
+    script.onerror=()=>reject(new Error("OCR library gagal dimuat"));
+    document.head.appendChild(script);
+  });
+  try{return await window.__notedOcrLoading}catch(e){window.__notedOcrLoading=null;throw e}
+}
+function normalizeOcrNumber(token){
+  let s=String(token||"").trim().replace(/(?:rp|idr)/ig,"").replace(/\s/g,"");
+  s=s.replace(/[^0-9.,]/g,"");
+  if(!s)return 0;
+  const dots=(s.match(/\./g)||[]).length, commas=(s.match(/,/g)||[]).length;
+  if(dots&&commas){
+    const lastDot=s.lastIndexOf("."),lastComma=s.lastIndexOf(",");
+    const dec=Math.max(lastDot,lastComma);
+    const after=s.length-dec-1;
+    if(after===2)s=s.slice(0,dec).replace(/[.,]/g,"")+s.slice(dec+1);
+    else s=s.replace(/[.,]/g,"");
+  }else if(dots||commas){
+    const sep=dots?".":",";
+    const parts=s.split(sep);
+    const last=parts[parts.length-1]||"";
+    if(parts.length>1 && last.length===2 && parts[0].length<=6){
+      s=parts.slice(0,-1).join("")+last;
+    }else s=parts.join("");
+  }
+  return Number(s)||0;
+}
+function extractMoneyCandidates(line){
+  const matches=String(line||"").match(/(?:Rp\.?\s*)?\d[\d\s.,]{2,}/gi)||[];
+  return matches.map(raw=>({raw,value:normalizeOcrNumber(raw)})).filter(x=>x.value>=100&&x.value<=1000000000);
+}
+function parseReceiptDate(text){
+  const t=String(text||"");
+  let m=t.match(/\b(20\d{2})[\/.\-](0?[1-9]|1[0-2])[\/.\-](0?[1-9]|[12]\d|3[01])\b/);
+  if(m)return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
+  m=t.match(/\b(0?[1-9]|[12]\d|3[01])[\/.\-](0?[1-9]|1[0-2])[\/.\-](20\d{2}|\d{2})\b/);
+  if(m){let y=m[3];if(y.length===2)y="20"+y;return `${y}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`}
+  const months={jan:1,feb:2,mar:3,apr:4,mei:5,may:5,jun:6,jul:7,agu:8,aug:8,sep:9,okt:10,oct:10,nov:11,des:12,dec:12};
+  m=t.toLowerCase().match(/\b(\d{1,2})\s+(jan|feb|mar|apr|mei|may|jun|jul|agu|aug|sep|okt|oct|nov|des|dec)[a-z]*\s+(20\d{2}|\d{2})\b/);
+  if(m){let y=m[3];if(y.length===2)y="20"+y;return `${y}-${String(months[m[2]]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`}
+  return today();
+}
+function pickReceiptMerchant(lines){
+  const banned=/total|subtotal|tanggal|date|invoice|receipt|struk|nota|kasir|cashier|telp|phone|alamat|address|tax|ppn|qty|harga|change|kembali|tunai|cash/i;
+  const candidates=lines.slice(0,10).map(x=>x.trim()).filter(x=>x.length>=3&&x.length<=55&&/[A-Za-z]/.test(x)&&!banned.test(x)&&!/^\d/.test(x));
+  if(!candidates.length)return "";
+  candidates.sort((a,b)=>{
+    const score=s=>(/[A-Z]{3,}/.test(s)?4:0)+(s.split(/\s+/).length<=5?2:0)-((s.match(/\d/g)||[]).length*2);
+    return score(b)-score(a);
+  });
+  return candidates[0].replace(/[^\p{L}\p{N}&.'\- ]/gu," ").replace(/\s+/g," ").trim();
+}
+function pickReceiptTotal(lines){
+  const strong=/grand\s*total|total\s*(belanja|bayar|payment|amount)|jumlah\s*(bayar|total)|amount\s*due|net\s*total/i;
+  const medium=/\btotal\b|\bjumlah\b|\bamount\b/i;
+  for(const regex of [strong,medium]){
+    const hits=[];
+    lines.forEach((line,i)=>{if(regex.test(line)){extractMoneyCandidates(line).forEach(x=>hits.push({...x,i}))}});
+    if(hits.length)return Math.max(...hits.map(x=>x.value));
+  }
+  const all=[];
+  lines.forEach((line,i)=>{
+    if(/tel|phone|npwp|tax id|invoice|order/i.test(line))return;
+    extractMoneyCandidates(line).forEach(x=>all.push({...x,i}));
+  });
+  return all.length?Math.max(...all.map(x=>x.value)):0;
+}
+function setSelectCaseInsensitive(id,value){
+  const el=$(id);if(!el||!value)return false;
+  const opt=[...el.options].find(o=>o.value.toLowerCase()===String(value).toLowerCase());
+  if(opt){el.value=opt.value;return true}return false;
+}
+function guessReceiptCategory(text){
+  const s=String(text||"").toLowerCase();
+  let main="",sub="";
+  if(/pertamina|shell|bp akr|spbu|bensin|fuel/.test(s)){main="Transportasi";sub="Bensin"}
+  else if(/gojek|grab|maxim|ojol|taxi/.test(s)){main="Transportasi";sub="Ojol"}
+  else if(/indomaret|alfamart|alfamidi|supermarket|hypermart|transmart|lottemart|minimarket|grocery/.test(s)){main="Belanja";sub="Kebutuhan Rumah"}
+  else if(/apotek|pharmacy|kimia farma|guardian|watsons|obat/.test(s)){main="Kesehatan";sub="Obat"}
+  else if(/pln|listrik/.test(s)){main="Tagihan";sub="Listrik"}
+  else if(/indihome|telkom|internet|wifi|myrepublic|biznet/.test(s)){main="Tagihan";sub="Internet"}
+  else if(/restaurant|restoran|warung|cafe|coffee|kopi|kfc|mcd|mcdonald|burger|bakso|mie|ayam|sate|food/.test(s)){main="Makan";sub="Makan Siang"}
+  if(main && setSelectCaseInsensitive("receiptMainCat",main)){
+    refreshReceiptSubcategory();
+    setSelectCaseInsensitive("receiptSubCat",sub);
+  }
+}
+function parseReceiptText(text){
+  const lines=String(text||"").split(/\r?\n/).map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean);
+  const merchant=pickReceiptMerchant(lines);
+  const total=pickReceiptTotal(lines);
+  const date=parseReceiptDate(text);
+  return {lines,merchant,total,date};
+}
+async function handleReceiptFile(event){
+  const file=event.target.files?.[0];
+  if(!file)return;
+  receiptCurrentFile=file;
+  if(receiptPreviewUrl)URL.revokeObjectURL(receiptPreviewUrl);
+  receiptPreviewUrl=URL.createObjectURL(file);
+  $("receiptPreview").src=receiptPreviewUrl;
+  $("receiptPreviewWrap").classList.add("show");
+  $("receiptRescanBtn").disabled=false;
+  await scanCurrentReceipt();
+}
+async function scanCurrentReceipt(){
+  if(!receiptCurrentFile||receiptScanning)return;
+  receiptScanning=true;
+  $("receiptSaveBtn").disabled=true;
+  $("receiptRescanBtn").disabled=true;
+  setReceiptStatus("Menyiapkan mesin OCR…",4);
+  try{
+    await ensureReceiptOcr();
+    setReceiptStatus("Membaca nota…",8);
+    const result=await Tesseract.recognize(receiptCurrentFile,"eng",{
+      logger:m=>{
+        if(m.status==="recognizing text"){
+          const pct=10+(Number(m.progress)||0)*85;
+          setReceiptStatus(`Membaca nota… ${Math.round((Number(m.progress)||0)*100)}%`,pct);
+        }else if(m.status){setReceiptStatus(`OCR: ${m.status}`,6+(Number(m.progress)||0)*80)}
+      }
+    });
+    const text=result?.data?.text||"";
+    $("receiptRawText").value=text.trim();
+    const parsed=parseReceiptText(text);
+    if(parsed.merchant){$("receiptMerchant").value=parsed.merchant;$("receiptNote").value=parsed.merchant}
+    if(parsed.total)$("receiptAmount").value=parsed.total.toLocaleString("id-ID");
+    if(parsed.date)$("receiptDate").value=parsed.date;
+    guessReceiptCategory(`${parsed.merchant}\n${text}`);
+    const parts=[];
+    if(parsed.merchant)parts.push(`toko: ${parsed.merchant}`);
+    if(parsed.total)parts.push(`total: ${rp(parsed.total)}`);
+    parts.push(`tanggal: ${formatDate(parsed.date)}`);
+    setReceiptStatus(`Scan selesai · ${parts.join(" · ")}. Periksa sebelum simpan.`,100);
+  }catch(e){
+    console.error("Receipt OCR:",e);
+    setReceiptStatus("Gagal membaca nota. Pastikan internet aktif saat pertama kali memakai OCR, lalu coba foto yang lebih jelas.",0);
+    alert("Scan nota gagal. Coba lagi dengan foto yang terang dan lurus. Pada penggunaan pertama, mesin OCR perlu dimuat melalui internet.");
+  }finally{
+    receiptScanning=false;
+    $("receiptSaveBtn").disabled=false;
+    $("receiptRescanBtn").disabled=!receiptCurrentFile;
+  }
+}
+async function saveReceiptExpense(){
+  if(receiptScanning)return;
+  const amount=money($("receiptAmount").value),walletId=Number($("receiptWallet").value)||0;
+  if(amount<=0)return alert("Nominal hasil scan belum benar. Silakan koreksi terlebih dahulu.");
+  if(!walletId||!data.wallets.some(w=>w.id===walletId))return alert("Pilih dompet terlebih dahulu.");
+  const mainCategory=$("receiptMainCat").value||"Lainnya",subcategory=$("receiptSubCat").value||"",merchant=$("receiptMerchant").value.trim(),note=$("receiptNote").value.trim()||merchant||"Scan Nota";
+  const tx={id:data.nextTx++,type:"EXPENSE",amount,walletId,date:$("receiptDate").value||today(),note,mainCategory,subcategory,category:mainCategory,receiptScan:true,receiptMerchant:merchant};
+  const snapshot=JSON.parse(JSON.stringify(data));let savedImageId=null;
+  const shouldSave=!!($("receiptSaveImage")?.checked&&receiptCurrentFile);
+  if(shouldSave){
+    try{
+      setReceiptStatus("Menyiapkan foto nota untuk disimpan…",100);
+      const processed=await compressReceiptImage(receiptCurrentFile),imageId=makeReceiptImageId(tx.id);
+      await receiptIdbSet(imageId,{blob:processed.blob,size:processed.blob.size,createdAt:Date.now(),txId:tx.id,merchant,date:tx.date,mime:processed.blob.type||receiptCurrentFile.type||"image/jpeg",width:processed.width,height:processed.height,compressed:processed.compressed});
+      tx.receiptImageId=imageId;savedImageId=imageId;
+    }catch(e){
+      console.error("save receipt image",e);
+      if(!confirm("Foto nota gagal disimpan. Simpan transaksi tanpa foto?")){data=normalize(snapshot);return}
+    }
+  }
+  data.tx.push(tx);
+  const ok=await persistData();
+  if(!ok){data=normalize(snapshot);if(savedImageId)try{await receiptIdbDelete(savedImageId)}catch(e){}return alert("Gagal menyimpan hasil scan. Data tidak diubah.")}
+  closeReceiptScanner();try{renderAll()}catch(e){console.error(e)}refreshReceiptStorageUsage();showToast(savedImageId?"Pengeluaran + foto nota tersimpan":"Pengeluaran dari nota tersimpan");
+}
 
 function openQuickChooser(){
   $("quickChooserView").classList.remove("hidden");
@@ -2068,7 +2510,7 @@ function openTxDetail(id){
  <div class="detail-item"><small>${tr("date")}</small><b>${formatDate(t.date)}</b></div>
  <div class="detail-item"><small>${tr("wallet")}</small><b>${esc(w?.name||"-")}</b></div>
  ${t.type==="TRANSFER"?`<div class="detail-item"><small>${tr("toWallet")}</small><b>${esc(to?.name||"-")}</b></div>`:`<div class="detail-item"><small>${tr("mainCategory")}</small><b>${esc(t.mainCategory||t.category||"-")}</b></div><div class="detail-item"><small>${tr("subcategory")}</small><b>${esc(t.subcategory||"-")}</b></div>`}
- </div><div class="detail-note"><b>${tr("note")}</b><br>${esc(t.note||"-")}</div>`;
+ </div><div class="detail-note"><b>${tr("note")}</b><br>${esc(t.note||"-")}</div>${t.receiptImageId?`<button class="btn primary receipt-photo-btn" type="button" onclick="openReceiptImageForTx(${t.id})">Lihat Foto Nota</button>`:""}`;
  openModal("txDetailModal")
 }
 function editCurrentTx(){const t=data.tx.find(x=>x.id===currentTxDetailId);if(!t)return;if(t.sourceType)return alert(lang==="en"?"Edit this payment from its finance module.":"Edit pembayaran ini dari modul Tagihan/Hutang/Piutang asalnya.");closeModal("txDetailModal");openTx(t.type,true,t.id)}
@@ -2077,10 +2519,12 @@ async function deleteTx(){
  const t=data.tx.find(x=>Number(x.id)===id);if(!t)return;
  if(t.sourceType)return alert(lang==="en"?"Delete this payment from its finance module.":"Hapus pembayaran ini dari modul Tagihan/Hutang/Piutang asalnya.");
  if(!confirm(lang==="en"?"Delete this transaction?":"Hapus transaksi ini?"))return;
+ const receiptImageId=t.receiptImageId||null;
  data.tx=data.tx.filter(x=>Number(x.id)!==id);
  const ok=await persistData();
  if(!ok)return alert(lang==="en"?"Failed to delete transaction.":"Gagal menghapus transaksi.");
- closeQuickTransactionModal();safeRenderAll();showToast(lang==="en"?"Transaction deleted":"Transaksi dihapus");
+ if(receiptImageId)try{await receiptIdbDelete(receiptImageId)}catch(e){console.error(e)}
+ closeQuickTransactionModal();safeRenderAll();refreshReceiptStorageUsage();showToast(lang==="en"?"Transaction deleted":"Transaksi dihapus");
 }
 function walletEyeSvg(hidden){
  if(hidden){
@@ -3397,6 +3841,9 @@ function renderSettings(){
      :"localStorage • mode cadangan";
  }
 
+ const rs=$("receiptSaveDefaultSetting"),rc=$("receiptCompressSetting"),rr=$("receiptRetentionSetting");
+ if(rs)rs.checked=getReceiptSaveDefault();if(rc)rc.checked=getReceiptCompression();if(rr)rr.value=String(getReceiptRetention());
+ refreshReceiptStorageUsage();
  bindSettingDropState();
  loadSettingDropState();
  applyFontSize(getFontSize());
@@ -3451,8 +3898,99 @@ function getNotifications(){
 }
 function updateNotifications(){const n=getNotifications().length;$("notifyDot").textContent=n;$("notifyDot").classList.toggle("hidden",n===0)}
 function openNotifications(){const n=getNotifications();$("notificationsList").innerHTML=n.length?n.map(x=>`<div class="notify-item"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join(""):`<div class="empty">${lang==="en"?"No notifications.":"Tidak ada notifikasi."}</div>`;openModal("notificationsModal")}
-function backupData(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({app:"Noted",version:"15.0",schemaVersion:SCHEMA_VERSION,data},null,2)],{type:"application/json"}));a.href=url;a.download=`noted-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
+function downloadBlobFile(blob,name){const a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+function backupData(){downloadBlobFile(new Blob([JSON.stringify({app:"Noted",version:"15.5",schemaVersion:SCHEMA_VERSION,receiptImagesIncluded:false,data},null,2)],{type:"application/json"}),`noted-backup-${today()}.json`)}
 $("restoreFile").onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const p=JSON.parse(await f.text()),d=normalize(p.data||p);if(!d.wallets||!d.tx||!d.bills)throw 0;if(confirm(lang==="en"?"Replace current data?":"Ganti semua data saat ini?")){data=d;await save()}}catch(_){alert(lang==="en"?"Invalid backup file.":"File backup tidak valid.")}e.target.value=""}
+
+/* ===== Noted Full Backup ZIP (store-only, no external library) ===== */
+const ZIP_UTF8_FLAG=0x0800;
+let zipCrcTable=null;
+function zipCrc32(bytes){
+ if(!zipCrcTable){zipCrcTable=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?(0xedb88320^(c>>>1)):(c>>>1);zipCrcTable[n]=c>>>0}}
+ let c=0xffffffff;for(const b of bytes)c=zipCrcTable[(c^b)&255]^(c>>>8);return (c^0xffffffff)>>>0
+}
+function zipU16(n){const a=new Uint8Array(2),v=new DataView(a.buffer);v.setUint16(0,n,true);return a}
+function zipU32(n){const a=new Uint8Array(4),v=new DataView(a.buffer);v.setUint32(0,n>>>0,true);return a}
+function zipJoin(parts){const len=parts.reduce((n,p)=>n+p.length,0),out=new Uint8Array(len);let pos=0;for(const p of parts){out.set(p,pos);pos+=p.length}return out}
+function zipDosTimeDate(date=new Date()){
+ const year=Math.max(1980,date.getFullYear()),time=(date.getHours()<<11)|(date.getMinutes()<<5)|(date.getSeconds()>>1),day=(date.getDate())|((date.getMonth()+1)<<5)|((year-1980)<<9);return {time,date:day}
+}
+async function zipBytes(value){
+ if(value instanceof Uint8Array)return value;if(value instanceof ArrayBuffer)return new Uint8Array(value);if(value instanceof Blob)return new Uint8Array(await value.arrayBuffer());return new TextEncoder().encode(String(value))
+}
+async function buildStoredZip(entries){
+ const localParts=[],centralParts=[];let offset=0;const dt=zipDosTimeDate();
+ for(const entry of entries){
+   const nameBytes=new TextEncoder().encode(entry.name),bytes=await zipBytes(entry.data),crc=zipCrc32(bytes),size=bytes.length;
+   if(size>0xffffffff)throw new Error("Satu file backup terlalu besar untuk ZIP standar.");
+   const local=zipJoin([zipU32(0x04034b50),zipU16(20),zipU16(ZIP_UTF8_FLAG),zipU16(0),zipU16(dt.time),zipU16(dt.date),zipU32(crc),zipU32(size),zipU32(size),zipU16(nameBytes.length),zipU16(0),nameBytes]);
+   localParts.push(local,bytes);
+   const central=zipJoin([zipU32(0x02014b50),zipU16(20),zipU16(20),zipU16(ZIP_UTF8_FLAG),zipU16(0),zipU16(dt.time),zipU16(dt.date),zipU32(crc),zipU32(size),zipU32(size),zipU16(nameBytes.length),zipU16(0),zipU16(0),zipU16(0),zipU16(0),zipU32(0),zipU32(offset),nameBytes]);
+   centralParts.push(central);offset+=local.length+size;
+ }
+ const central=zipJoin(centralParts),local=zipJoin(localParts),eocd=zipJoin([zipU32(0x06054b50),zipU16(0),zipU16(0),zipU16(entries.length),zipU16(entries.length),zipU32(central.length),zipU32(local.length),zipU16(0)]);
+ return new Blob([local,central,eocd],{type:"application/zip"});
+}
+function zipExtForMime(mime){mime=String(mime||"").toLowerCase();if(mime.includes("webp"))return ".webp";if(mime.includes("png"))return ".png";if(mime.includes("gif"))return ".gif";return ".jpg"}
+function getBackupSettings(){
+ const keys=[NOTED_THEME_KEY,NOTED_LANG_KEY,FONT_SIZE_KEY,RECEIPT_SAVE_DEFAULT_KEY,RECEIPT_COMPRESS_KEY,RECEIPT_RETENTION_KEY,LAST_PAGE_KEY,LAST_FINANCE_PAGE_OPEN_KEY,LAST_WALLET_TAB_KEY];const out={};
+ for(const key of keys){try{const v=localStorage.getItem(key);if(v!=null)out[key]=v}catch(e){}}
+ return out;
+}
+async function backupFullNoted(){
+ try{
+   if(!receiptStoreReady())throw new Error("Penyimpanan IndexedDB foto nota belum tersedia.");
+   const receipts=await receiptIdbEntries(),entries=[],receiptIndex=[];
+   const packageData={app:"Noted",version:"15.5",schemaVersion:SCHEMA_VERSION,createdAt:new Date().toISOString(),receiptImagesIncluded:true,data};
+   entries.push({name:"data.json",data:JSON.stringify(packageData,null,2)});
+   entries.push({name:"settings.json",data:JSON.stringify({app:"Noted",version:"15.5",settings:getBackupSettings()},null,2)});
+   for(const item of receipts){
+     const rec=item.value||{};if(!(rec.blob instanceof Blob))continue;
+     const ext=zipExtForMime(rec.mime||rec.blob.type),file=`receipts/${String(item.key).replace(/[^a-zA-Z0-9._-]/g,"_")}${ext}`;
+     receiptIndex.push({key:String(item.key),file,meta:{size:Number(rec.size||rec.blob.size)||0,createdAt:Number(rec.createdAt)||Date.now(),txId:rec.txId,merchant:rec.merchant||"",date:rec.date||"",mime:rec.mime||rec.blob.type||"image/jpeg",width:Number(rec.width)||0,height:Number(rec.height)||0,compressed:!!rec.compressed}});
+     entries.push({name:file,data:rec.blob});
+   }
+   entries.push({name:"receipts/index.json",data:JSON.stringify({count:receiptIndex.length,items:receiptIndex},null,2)});
+   showToast(`Menyiapkan backup lengkap · ${receiptIndex.length} foto`);
+   const zip=await buildStoredZip(entries);downloadBlobFile(zip,`noted-full-backup-${today()}.zip`);
+   showToast(`Backup lengkap siap · ${formatBytes(zip.size)}`);
+ }catch(e){console.error("backupFullNoted",e);alert("Gagal membuat backup lengkap: "+(e?.message||e))}
+}
+function findZipEocd(bytes){for(let i=bytes.length-22;i>=Math.max(0,bytes.length-65557);i--){if(bytes[i]===0x50&&bytes[i+1]===0x4b&&bytes[i+2]===0x05&&bytes[i+3]===0x06)return i}return -1}
+async function parseStoredZip(file){
+ const bytes=new Uint8Array(await file.arrayBuffer()),view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength),eocd=findZipEocd(bytes);if(eocd<0)throw new Error("Struktur ZIP tidak ditemukan.");
+ const count=view.getUint16(eocd+10,true),centralOffset=view.getUint32(eocd+16,true),decoder=new TextDecoder("utf-8"),out=new Map();let p=centralOffset;
+ for(let i=0;i<count;i++){
+   if(view.getUint32(p,true)!==0x02014b50)throw new Error("Central directory ZIP rusak.");
+   const method=view.getUint16(p+10,true),size=view.getUint32(p+20,true),nameLen=view.getUint16(p+28,true),extraLen=view.getUint16(p+30,true),commentLen=view.getUint16(p+32,true),localOffset=view.getUint32(p+42,true),name=decoder.decode(bytes.slice(p+46,p+46+nameLen));
+   if(method!==0)throw new Error("ZIP ini memakai kompresi yang tidak didukung. Gunakan file Backup Lengkap yang dibuat oleh Noted.");
+   if(view.getUint32(localOffset,true)!==0x04034b50)throw new Error("File ZIP rusak.");
+   const localNameLen=view.getUint16(localOffset+26,true),localExtraLen=view.getUint16(localOffset+28,true),start=localOffset+30+localNameLen+localExtraLen;out.set(name,bytes.slice(start,start+size));p+=46+nameLen+extraLen+commentLen;
+ }
+ return out;
+}
+function bytesToText(bytes){return new TextDecoder("utf-8").decode(bytes)}
+function restoreBackupSettings(payload){
+ const settings=payload?.settings||{};for(const [key,val] of Object.entries(settings)){try{localStorage.setItem(key,String(val))}catch(e){}}
+}
+async function restoreFullNoted(file){
+ if(!receiptStoreReady())throw new Error("Penyimpanan IndexedDB foto nota belum tersedia di browser ini.");
+ const entries=await parseStoredZip(file),dataBytes=entries.get("data.json");if(!dataBytes)throw new Error("data.json tidak ditemukan di backup.");
+ const pkg=JSON.parse(bytesToText(dataBytes)),incoming=normalize(pkg.data||pkg);if(!Array.isArray(incoming.wallets)||!Array.isArray(incoming.tx)||!Array.isArray(incoming.bills))throw new Error("Data backup tidak valid.");
+ let receiptManifest={items:[]};if(entries.has("receipts/index.json"))receiptManifest=JSON.parse(bytesToText(entries.get("receipts/index.json")));
+ const prepared=[];for(const item of receiptManifest.items||[]){const bytes=entries.get(item.file);if(!bytes)throw new Error(`Foto nota hilang: ${item.file}`);const meta=item.meta||{},mime=meta.mime||({webp:"image/webp",png:"image/png",gif:"image/gif"}[String(item.file).split(".").pop().toLowerCase()]||"image/jpeg");prepared.push({key:String(item.key),record:{...meta,blob:new Blob([bytes],{type:mime}),size:bytes.length,mime}})}
+ if(!confirm(`Restore lengkap akan MENGGANTI data saat ini dan arsip foto nota dengan backup ini.\n\n${incoming.tx.length} transaksi · ${prepared.length} foto nota\n\nLanjutkan?`))return;
+ const oldData=structuredCloneSafe(data),oldReceipts=await receiptIdbEntries(),oldSettings=getBackupSettings();
+ try{
+   data=incoming;await receiptIdbClear();for(const item of prepared)await receiptIdbSet(item.key,item.record);
+   const ok=await persistData();if(!ok)throw new Error("Gagal menyimpan data utama setelah restore.");
+   if(entries.has("settings.json")){try{restoreBackupSettings(JSON.parse(bytesToText(entries.get("settings.json"))))}catch(e){console.warn("restore settings",e)}}
+   applyFontSize(getFontSize());loadTheme();lang=localStorage.getItem(NOTED_LANG_KEY)||localStorage.getItem(LANG_KEY)||"id";applyLanguage();safeRenderAll();await refreshReceiptStorageUsage();showToast(`Restore lengkap berhasil · ${prepared.length} foto`);
+ }catch(e){
+   console.error("restoreFullNoted",e);data=oldData;try{await receiptIdbClear();for(const item of oldReceipts)await receiptIdbSet(item.key,item.value);for(const [key,val] of Object.entries(oldSettings)){try{localStorage.setItem(key,String(val))}catch(_){}}await persistData()}catch(rollbackError){console.error("rollback restore",rollbackError)}throw e;
+ }
+}
+$("restoreFullFile").onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{showToast("Membaca backup lengkap…");await restoreFullNoted(f)}catch(err){console.error(err);alert("Restore lengkap gagal: "+(err?.message||err))}e.target.value=""}
 function resetData(){if(confirm(lang==="en"?"Delete all data?":"Hapus semua data?")&&confirm(lang==="en"?"Are you sure?":"Yakin?")){data=defaultData();save()}}
 function loadDemo(){
  if(!confirm(lang==="en"?"Load demo data?":"Muat data demo?"))return;const d=new Date().getDate();
@@ -3492,7 +4030,7 @@ function renderAll(){
 
 function runNotedDiagnostics(){
   const issues=[],warnings=[];
-  const requiredIds=["homeBalance","walletGrid","billTable","debtTable","receivableTable","categoryReport","swatches","subcategoryModal","subType","subMainCat","subName","quickAddModal","quickChooserView","quickFormView","txAmount","txWallet","txNote","debtModal","debtName","debtTotal","debtInstallmentCount","receivableModal","receivableName","receivableTotal","financePaymentModal","financePaymentAmount"];
+  const requiredIds=["homeBalance","walletGrid","billTable","debtTable","receivableTable","categoryReport","swatches","subcategoryModal","subType","subMainCat","subName","quickAddModal","quickChooserView","quickFormView","txAmount","txWallet","txNote","debtModal","debtName","debtTotal","debtInstallmentCount","receivableModal","receivableName","receivableTotal","financePaymentModal","financePaymentAmount","receiptModal","receiptCamera","receiptUpload","receiptAmount","receiptWallet","receiptMainCat","receiptSubCat","receiptSaveImage","receiptImageModal","receiptImageViewer","receiptStorageUsage"];
   requiredIds.forEach(id=>{if(!$(id))issues.push("Missing #"+id)});
   ["wallets","tx","bills","debts","receivables"].forEach(k=>{if(!Array.isArray(data[k]))issues.push(`${k} invalid`)});
   if(!data.categories?.EXPENSE||!data.categories?.INCOME)issues.push("categories invalid");
@@ -3525,6 +4063,7 @@ function runNotedDiagnostics(){
 async function startApp(){
   applyFontSize(getFontSize());
  await initStorage();
+ cleanupExpiredReceipts(false).catch(()=>{});
  loadTheme();
  applyLanguage();
  $("txDate").value=today();
